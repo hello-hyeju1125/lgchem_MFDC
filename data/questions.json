@@ -1,0 +1,194 @@
+[
+  {
+    "id": "M1",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "나는 성취감 자체를 위해 스스로 높은 목표를 설정하는 편이다."
+  },
+  {
+    "id": "M2",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "나는 새로운 과제를 통해 성장하고 배우는 것에서 동기를 느낀다."
+  },
+  {
+    "id": "M3",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "내가 스스로 결정한 일을 수행할 때 가장 동기부여된다."
+  },
+  {
+    "id": "M4",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "자율적으로 일할수록 성과가 더 잘 나온다고 느낀다."
+  },
+  {
+    "id": "M5",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "나는 결과보다 도전 과정 자체에서 의미를 찾는 편이다."
+  },
+  {
+    "id": "M6",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "과제 자체가 흥미로울 때 가장 몰입하게 된다."
+  },
+  {
+    "id": "M7",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "주어진 자유와 재량이 클수록 동기부여가 높아진다."
+  },
+  {
+    "id": "M8",
+    "axis": "Motivation",
+    "dimension": "Intrinsic",
+    "statement": "일의 방법을 스스로 선택할 수 있을 때 성과가 더 높아진다."
+  },
+  {
+    "id": "F9",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "나는 새로운 방식을 시도하며 문제를 해결하는 것을 선호한다."
+  },
+  {
+    "id": "F10",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "나는 기존 방식을 개선하려는 아이디어를 자주 떠올린다."
+  },
+  {
+    "id": "F11",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "위기 상황에서는 새로운 대안을 과감히 제시하는 편이다."
+  },
+  {
+    "id": "F12",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "환경 변화에 맞춰 전략을 빠르게 조정하는 편이다."
+  },
+  {
+    "id": "F13",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "나는 우리 팀만의 강점을 살릴 수 있는 창의적 대안을 찾으려 한다."
+  },
+  {
+    "id": "F14",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "나는 새로운 시도가 경쟁 우위를 만든다고 믿는다."
+  },
+  {
+    "id": "F15",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "나는 불확실한 상황을 기회로 삼아 도전하려는 편이다."
+  },
+  {
+    "id": "F16",
+    "axis": "Flexibility",
+    "dimension": "Change",
+    "statement": "변화가 있을 때 나는 적극적으로 대응하는 편이다."
+  },
+  {
+    "id": "D17",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "리더의 가장 중요한 역할은 목표를 달성하는 것이라고 생각한다."
+  },
+  {
+    "id": "D18",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "성과 지표가 리더십의 성공을 가장 잘 보여준다고 느낀다."
+  },
+  {
+    "id": "D19",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "구성원에게 도전적인 목표를 제시하는 것이 성과를 만든다고 본다."
+  },
+  {
+    "id": "D20",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "목표 달성 여부가 리더 평가의 핵심이라고 생각한다."
+  },
+  {
+    "id": "D21",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "결과를 만들지 못한다면 리더십의 의미가 약해진다고 느낀다."
+  },
+  {
+    "id": "D22",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "목표를 달성해야 리더로서 인정받을 수 있다고 생각한다."
+  },
+  {
+    "id": "D23",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "성과에 대한 보상이 구성원의 동기를 가장 크게 자극한다고 본다."
+  },
+  {
+    "id": "D24",
+    "axis": "Direction",
+    "dimension": "Results",
+    "statement": "성과 중심의 회의와 점검이 리더십의 본질에 가깝다고 느낀다."
+  },
+  {
+    "id": "C25",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "리더는 방향을 명확히 제시하고 구성원은 이를 따르는 것이 효율적이라고 본다."
+  },
+  {
+    "id": "C26",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "나는 지시와 통제가 업무 효율을 높인다고 느낀다."
+  },
+  {
+    "id": "C27",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "나는 주로 일방적으로 방향을 제시하는 편이다."
+  },
+  {
+    "id": "C28",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "구성원에게는 명확한 역할과 지시를 전달하는 것이 중요하다고 본다."
+  },
+  {
+    "id": "C29",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "리더의 권위는 분명한 지시를 통해 유지된다고 생각한다."
+  },
+  {
+    "id": "C30",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "구성원에게는 구체적인 지시가 필요하다고 느낀다."
+  },
+  {
+    "id": "C31",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "명확한 지시가 혼선을 줄이고 실행력을 높인다고 본다."
+  },
+  {
+    "id": "C32",
+    "axis": "Communication",
+    "dimension": "Direct",
+    "statement": "나는 통제가 성과를 만드는 핵심 요소라고 생각한다."
+  }
+]
