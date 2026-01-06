@@ -3,7 +3,7 @@
  * 
  * 이 스크립트는 scoring.ts의 점수 계산 로직을 검증합니다.
  * - 일반 케이스 테스트
- * - 동점(tie) 케이스 테스트
+ * - 균형 케이스 테스트 (avgBipolar = 0인 경우 dimension2로 판단)
  * - 엣지 케이스 테스트
  * 
  * 실행 방법:
@@ -32,9 +32,10 @@ const testCases = [
     expectedCode: 'ICRD',
   },
   {
-    name: '동점 케이스: 한 축이 동점',
+    name: '동점 케이스: 한 축이 동점 (0인 경우 dimension2로 판단)',
     answers: {
-      // Motivation: 동점 만들기 (각 4점씩, 총합 32점)
+      // Motivation: 동점 만들기 (각 4점씩, avgBipolar = 0)
+      // avgBipolar >= 0이면 dimension2 (Extrinsic)로 판단
       M1: 4, M2: 4, M3: 4, M4: 4, M5: 4, M6: 4, M7: 4, M8: 4,
       // Flexibility: Change 우세
       F9: 6, F10: 6, F11: 6, F12: 6, F13: 6, F14: 6, F15: 6, F16: 6,
@@ -43,7 +44,7 @@ const testCases = [
       // Communication: Direct 우세
       C25: 6, C26: 6, C27: 6, C28: 6, C29: 6, C30: 6, C31: 6, C32: 6,
     } as Answers,
-    expectedCode: 'XCRD', // Motivation이 동점이므로 'X'
+    expectedCode: 'ECRD', // Motivation이 0이면 Extrinsic (E)로 판단
   },
   {
     name: '반대 극성 케이스: ESPN 유형',

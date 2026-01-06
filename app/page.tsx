@@ -233,7 +233,8 @@ export default function Home() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="예: 홍길동"
-                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow"
+                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-base sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow"
+                  style={{ fontSize: '16px' }}
                 />
               </div>
               <div>
@@ -246,7 +247,8 @@ export default function Home() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="예: hong.gildong@lgchem.com"
-                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow"
+                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-base sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow"
+                  style={{ fontSize: '16px' }}
                 />
               </div>
               <div>
@@ -259,7 +261,8 @@ export default function Home() {
                   value={sessionCode}
                   onChange={(e) => setSessionCode(e.target.value)}
                   placeholder="운영자가 안내한 코드를 입력해 주세요."
-                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow tracking-widest"
+                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-base sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow tracking-widest"
+                  style={{ fontSize: '16px' }}
                 />
               </div>
             </div>
@@ -277,7 +280,8 @@ export default function Home() {
             onClick={handleStart}
             className="inline-block rounded-full text-white font-bold text-base sm:text-lg md:text-xl w-full sm:w-auto px-10 sm:px-14 md:px-16 py-4 sm:py-5 md:py-6 transition-all duration-300 group relative overflow-hidden hover:-translate-y-1 active:translate-y-0"
             style={{ 
-              boxShadow: '0 20px 25px -5px rgba(85, 29, 131, 0.4), 0 10px 10px -5px rgba(85, 29, 131, 0.3)'
+              boxShadow: '0 20px 25px -5px rgba(85, 29, 131, 0.4), 0 10px 10px -5px rgba(85, 29, 131, 0.3)',
+              fontSize: '16px'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(85, 29, 131, 0.5), 0 15px 15px -5px rgba(85, 29, 131, 0.4)';

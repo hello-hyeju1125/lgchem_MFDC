@@ -116,10 +116,12 @@ function TestPageContent() {
   ).length;
   
   // 전체 답변한 문항 수 계산
+  // answers 객체에 저장된 모든 답변을 세며, null/undefined가 아닌 값을 카운트
   const answeredCount = Object.keys(answers).filter(
     (id) => answers[id] !== null && answers[id] !== undefined
   ).length;
   
+  // progress는 answeredCount와 동일 (답이 선택되면 자동으로 answers에 저장되고 포함됨)
   const progress = answeredCount;
 
   // 현재 활성화된 문항의 답변 여부 확인
@@ -279,7 +281,7 @@ function TestPageContent() {
   // 세션 코드 검증 중인 경우 로딩 화면 표시
   if (sessionValidating) {
     return (
-      <main className="min-h-screen py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-hidden flex items-center justify-center">
+      <main className="py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-y-auto flex items-center justify-center">
         {/* 배경 그라데이션 */}
         <div className="absolute inset-0 bg-gradient-to-br from-brand-light-blue/10 via-white via-brand-light-gray/5 to-brand-purple/6" />
         
@@ -309,7 +311,7 @@ function TestPageContent() {
   }
 
   return (
-    <main className="min-h-screen py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-hidden">
+    <main className="py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-y-auto">
       {/* 배경 그라데이션 - 브랜드 색상 팔레트 활용 */}
       <div className="absolute inset-0 bg-gradient-to-br from-brand-light-blue/10 via-white via-brand-light-gray/5 to-brand-purple/6" />
       
@@ -319,13 +321,14 @@ function TestPageContent() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] bg-brand-purple/3 rounded-full blur-[120px] sm:blur-[140px]" />
       <div className="absolute top-1/3 right-1/3 w-48 h-48 sm:w-72 sm:h-72 bg-brand-light-blue/4 rounded-full blur-[80px] sm:blur-[100px]" />
       
-      <div className="w-full max-w-5xl mx-auto relative z-10">
+      <div className="w-full max-w-5xl mx-auto relative z-10 flex flex-col">
         {/* 세션 정보 표시 */}
         {sessionTitle && (
           <div className="mb-4 text-center">
             <p className="text-sm text-gray-600">세션: <span className="font-semibold text-gray-800">{sessionTitle}</span></p>
           </div>
         )}
+        {/* 안내 문구 */}
         <div className="mb-3 sm:mb-4 md:mb-5 animate-fade-in">
           <ProgressBar current={progress} total={totalQuestions} />
           <div className="mt-2 sm:mt-2 text-center">
@@ -337,26 +340,26 @@ function TestPageContent() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center min-h-[45vh] py-3 sm:py-4">
+        {/* 문항 카드 영역 */}
+        <div className="w-full max-w-4xl mx-auto py-3 sm:py-4">
           {currentQuestion && (
-            <div className="w-full max-w-4xl">
-              <QuestionCard
-                leftLabel={currentQuestion.left_label}
-                rightLabel={currentQuestion.right_label}
-                leftStatement={currentQuestion.left_statement}
-                rightStatement={currentQuestion.right_statement}
-                value={answers[currentQuestion.id] || null}
-                onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
-                disabled={false}
-              />
-            </div>
+            <QuestionCard
+              leftLabel={currentQuestion.left_label}
+              rightLabel={currentQuestion.right_label}
+              leftStatement={currentQuestion.left_statement}
+              rightStatement={currentQuestion.right_statement}
+              value={answers[currentQuestion.id] || null}
+              onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+              disabled={false}
+            />
           )}
         </div>
 
         <div className="flex flex-row justify-between items-center mt-8 sm:mt-10 md:mt-12 gap-3 sm:gap-6 animate-fade-in">
           <button
             onClick={isFirstQuestion ? () => router.push('/') : handlePreviousQuestion}
-            className="glass-premium text-gray-700 px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-sm sm:text-lg md:text-xl transition-all duration-300 active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+            className="glass-premium text-gray-700 px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl transition-all duration-300 active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+            style={{ fontSize: '16px' }}
           >
             <span className="flex items-center justify-center whitespace-nowrap">
               {isFirstQuestion ? '← 메인으로' : '← 이전 문항'}
@@ -366,7 +369,8 @@ function TestPageContent() {
           {!isLastQuestion && (
             <button
               onClick={handleNextQuestion}
-              className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-sm sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+              className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+              style={{ fontSize: '16px' }}
             >
               <span className="flex items-center justify-center gap-1 sm:gap-3 whitespace-nowrap">
                 다음 문항
@@ -377,10 +381,11 @@ function TestPageContent() {
             </button>
           )}
           
-          {isLastQuestion && answers[currentQuestion?.id] && (
+          {isLastQuestion && (
             <button
               onClick={() => router.push('/result')}
-              className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-sm sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+              className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+              style={{ fontSize: '16px' }}
             >
               <span className="flex items-center justify-center gap-1 sm:gap-3 whitespace-nowrap">
                 결과 보기
@@ -399,7 +404,7 @@ function TestPageContent() {
 export default function TestPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-hidden flex items-center justify-center">
+      <main className="py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-y-auto flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-light-blue/10 via-white via-brand-light-gray/5 to-brand-purple/6" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-light-gray/30 border-t-brand-purple mx-auto mb-4" />

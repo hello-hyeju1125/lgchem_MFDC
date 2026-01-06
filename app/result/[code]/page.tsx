@@ -112,26 +112,77 @@ export default function ResultCodePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // URL에서 code를 가져오거나, localStorage에서 결과 계산
-    const answers = storage.loadAnswers();
-    if (Object.keys(answers).length === 0) {
-      // 답변이 없으면 메인으로 리다이렉트
-      router.push('/');
-      return;
-    }
-
-    const calculatedResult = calculateScores(answers);
     const codeUpper = code?.toUpperCase() || '';
     
-    // URL의 code와 계산된 결과가 일치하는지 확인
-    if (codeUpper && codeUpper !== calculatedResult.code) {
-      // 일치하지 않으면 올바른 URL로 리다이렉트
-      router.push(`/result/${calculatedResult.code.toLowerCase()}`);
+    // localStorage에서 답변 로드 시도
+    const answers = storage.loadAnswers();
+    
+    // 답변이 있는 경우: 정확한 점수로 계산
+    if (Object.keys(answers).length > 0) {
+      const calculatedResult = calculateScores(answers);
+      
+      // URL의 code와 계산된 결과가 일치하는지 확인
+      if (codeUpper && codeUpper !== calculatedResult.code) {
+        // 일치하지 않으면 올바른 URL로 리다이렉트
+        router.push(`/result/${calculatedResult.code.toLowerCase()}`);
+        return;
+      }
+      
+      setResult(calculatedResult);
+      setIsLoading(false);
       return;
     }
-
-    setResult(calculatedResult);
-    setIsLoading(false);
+    
+    // 답변이 없는 경우: URL의 code로 기본 결과 생성
+    if (codeUpper && codeUpper.length === 4) {
+      // 유효한 리더십 유형 코드인지 확인
+      const leadershipType = (leadershipTypes as Record<string, LeadershipType>)[codeUpper];
+      
+      if (!leadershipType) {
+        // 유효하지 않은 코드면 메인으로 리다이렉트
+        router.push('/');
+        return;
+      }
+      
+      // 기본 점수로 결과 생성 (각 축별로 50:50 또는 약간의 우세)
+      // 코드를 기반으로 어떤 축이 우세한지 파악
+      const axisConfig = {
+        Motivation: { dimension1: 'Intrinsic', dimension2: 'Extrinsic', code1: 'I', code2: 'E' },
+        Flexibility: { dimension1: 'Change', dimension2: 'System', code1: 'C', code2: 'S' },
+        Direction: { dimension1: 'Results', dimension2: 'People', code1: 'R', code2: 'P' },
+        Communication: { dimension1: 'Direct', dimension2: 'eNgage', code1: 'D', code2: 'N' },
+      };
+      
+      const axes = ['Motivation', 'Flexibility', 'Direction', 'Communication'] as const;
+      const scores: Result['scores'] = axes.map((axis, index) => {
+        const config = axisConfig[axis];
+        const codeChar = codeUpper[index];
+        const isDimension1 = codeChar === config.code1;
+        
+        // 우세한 쪽에 약간 더 높은 점수 (60:40 정도)
+        const score1 = isDimension1 ? 4.2 : 3.8;
+        const score2 = isDimension1 ? 3.8 : 4.2;
+        
+        return {
+          axis,
+          dimension1: config.dimension1,
+          dimension2: config.dimension2,
+          score1: Math.round(score1 * 10) / 10,
+          score2: Math.round(score2 * 10) / 10,
+          dominant: isDimension1 ? config.dimension1 : config.dimension2,
+        };
+      });
+      
+      setResult({
+        code: codeUpper,
+        scores,
+      });
+      setIsLoading(false);
+      return;
+    }
+    
+    // code가 없거나 유효하지 않으면 메인으로 리다이렉트
+    router.push('/');
   }, [code, router]);
 
   const handleRestart = () => {

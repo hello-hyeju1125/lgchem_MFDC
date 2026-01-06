@@ -10,9 +10,9 @@
  * - 선택 점수를 bipolar 값으로 변환: value = 선택 점수 - 4 (범위: -3 ~ +3)
  * - 각 축별 평균 bipolar 값을 계산하여 우세 극성 판단
  * 
- * 동점 처리:
- * - 평균 bipolar 값이 0에 가까운 경우 "balanced"로 표시
- * - leadership_type 코드 생성 시 balanced가 있으면 'X'로 표시 (예: "IXRD", "ECXD")
+ * 극성 판단:
+ * - 평균 bipolar 값이 음수면 dimension1, 양수면 dimension2로 판단
+ * - 미세한 차이도 인정하여 항상 한쪽 극성으로 판단 (균형 상태 없음)
  */
 
 import type { Answers } from './storage';
@@ -24,11 +24,11 @@ export interface AxisScore {
   dimension2: string;
   score1: number;
   score2: number;
-  dominant: string; // 'dimension1', 'dimension2', 또는 'balanced'
+  dominant: string; // 'dimension1' 또는 'dimension2'
 }
 
 export interface Result {
-  code: string; // 16유형 코드 (예: "ICRD", "ECXD" 등, balanced는 'X'로 표시)
+  code: string; // 16유형 코드 (예: "ICRD", "ECPD" 등)
   scores: AxisScore[];
 }
 
@@ -145,20 +145,16 @@ export function calculateScores(answers: Answers): Result {
     const score1 = Math.round((4 - avgBipolar) * 10) / 10; // dimension1 점수 (1~7 범위)
     const score2 = Math.round((4 + avgBipolar) * 10) / 10; // dimension2 점수 (1~7 범위)
 
-    // 우세 극성 판단 (0에 가까우면 balanced)
-    const BALANCED_THRESHOLD = 0.1; // 0.1 이내면 balanced로 간주
+    // 우세 극성 판단 (미세한 차이도 인정하여 항상 한쪽으로 판단)
     let dominant: string;
     let code: string;
     
-    if (Math.abs(avgBipolar) < BALANCED_THRESHOLD) {
-      dominant = 'balanced';
-      code = 'X'; // 동점인 경우 'X'로 표시
-    } else if (avgBipolar < 0) {
+    if (avgBipolar < 0) {
       // 음수면 dimension1 (left_label)에 가까움
       dominant = config.dimension1;
       code = config.code1;
     } else {
-      // 양수면 dimension2 (right_label)에 가까움
+      // 0 이상이면 dimension2 (right_label)에 가까움 (0인 경우도 포함)
       dominant = config.dimension2;
       code = config.code2;
     }
@@ -199,10 +195,10 @@ export function convertToDatabaseFormat(result: Result): {
   };
 
   const pole: DatabasePole = {
-    motivation: 'balanced',
-    flexibility: 'balanced',
-    direction: 'balanced',
-    communication: 'balanced',
+    motivation: 'intrinsic', // 기본값 (실제로는 각 축의 dominant에 따라 덮어씌워짐)
+    flexibility: 'change',
+    direction: 'results',
+    communication: 'direct',
   };
 
   // 각 축별로 변환
@@ -236,10 +232,8 @@ export function convertToDatabaseFormat(result: Result): {
       axisScores.communication[pole2Key as 'direct' | 'engage'] = Math.round(score2 * 100) / 100;
     }
 
-    // 우세 극성 변환 (대문자 → 소문자, 'balanced' 처리)
-    if (axisScore.dominant === 'balanced') {
-      pole[dbKey] = 'balanced';
-    } else if (axisScore.dominant === config.dimension1) {
+    // 우세 극성 변환 (대문자 → 소문자)
+    if (axisScore.dominant === config.dimension1) {
       pole[dbKey] = pole1Key as any;
     } else if (axisScore.dominant === config.dimension2) {
       pole[dbKey] = pole2Key as any;
