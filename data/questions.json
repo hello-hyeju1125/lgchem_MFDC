@@ -1,194 +1,290 @@
 [
   {
-    "id": "M1",
+    "id": "MOT_01",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 성취감 자체를 위해 스스로 높은 목표를 설정하는 편이다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "구성원이 왜 이 일이 중요한지 의미를 이해하도록 설명한다.",
+    "right_statement": "구성원이 성과를 내면 어떤 보상이나 평가가 따르는지 명확히 제시한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M2",
+    "id": "MOT_02",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 새로운 과제를 통해 성장하고 배우는 것에서 동기를 느낀다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "구성원이 새로운 과제를 통해 성장하도록 기회를 제공한다.",
+    "right_statement": "구성원이 성과를 통해 승진·보상·인정을 얻도록 유도한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M3",
+    "id": "MOT_03",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "내가 스스로 결정한 일을 수행할 때 가장 동기부여된다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "구성원이 스스로 의미를 느끼고 몰입할 수 있도록 구조를 설계한다.",
+    "right_statement": "구성원이 외부의 기대와 평가를 분명히 인식하도록 만든다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M4",
+    "id": "MOT_04",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "자율적으로 일할수록 성과가 더 잘 나온다고 느낀다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "자율성을 부여할수록 구성원의 책임감과 성과가 높아진다고 본다.",
+    "right_statement": "명확한 목표·기준·보상이 있어야 성과가 난다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M5",
+    "id": "MOT_05",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 결과보다 도전 과정 자체에서 의미를 찾는 편이다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "보상은 성과 이후에 따르는 결과이지, 동기의 핵심 요소는 아니라고 본다.",
+    "right_statement": "보상은 성과를 이끌어내는 중요한 동기 장치라고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M6",
+    "id": "MOT_06",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "과제 자체가 흥미로울 때 가장 몰입하게 된다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "구성원이 일 자체에서 재미와 의미를 느끼도록 만드는 것을 중요하게 생각한다.",
+    "right_statement": "구성원이 외부에서 인정받고 평가받는 경험을 중요하게 생각한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M7",
+    "id": "MOT_07",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "주어진 자유와 재량이 클수록 동기부여가 높아진다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "권한과 선택지를 많이 부여할수록 구성원이 더 몰입한다고 본다.",
+    "right_statement": "명확한 기대와 피드백을 제시할 때 구성원이 더 움직인다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "M8",
+    "id": "MOT_08",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "일의 방법을 스스로 선택할 수 있을 때 성과가 더 높아진다."
+    "left_label": "Intrinsic",
+    "right_label": "Extrinsic",
+    "left_statement": "구성원이 스스로 방법을 선택하고 주도할 때 성과가 높아진다고 본다.",
+    "right_statement": "구성원이 조직이나 리더의 인정을 받을 때 성과가 높아진다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F9",
+    "id": "FLX_01",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 새로운 방식을 시도하며 문제를 해결하는 것을 선호한다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "새로운 방식을 시도하며 창의적인 해결책을 찾는다.",
+    "right_statement": "검증된 절차와 규정을 충실히 따른다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F10",
+    "id": "FLX_02",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 기존 방식을 개선하려는 아이디어를 자주 떠올린다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "기존 방식을 개선하려는 아이디어를 적극적으로 제안한다.",
+    "right_statement": "절차를 지키며 일관된 성과를 내는 데 집중한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F11",
+    "id": "FLX_03",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "위기 상황에서는 새로운 대안을 과감히 제시하는 편이다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "위기 상황에서 과감하게 새로운 방안을 제시한다.",
+    "right_statement": "위기 상황에서 리스크를 최소화하며 안정성을 유지한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F12",
+    "id": "FLX_04",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "환경 변화에 맞춰 전략을 빠르게 조정하는 편이다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "환경 변화에 맞춰 전략을 신속히 전환한다.",
+    "right_statement": "변화보다 현재의 안정성을 지키는 것을 우선한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F13",
+    "id": "FLX_05",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 우리 팀만의 강점을 살릴 수 있는 창의적 대안을 찾으려 한다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "팀의 강점을 살리는 창의적 대안을 모색한다.",
+    "right_statement": "불필요한 낭비를 막기 위해 효율적 관리에 집중한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F14",
+    "id": "FLX_06",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 새로운 시도가 경쟁 우위를 만든다고 믿는다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "새로운 시도를 통해 경쟁 우위를 확보한다.",
+    "right_statement": "절차와 기준을 준수해 신뢰성을 확보한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F15",
+    "id": "FLX_07",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 불확실한 상황을 기회로 삼아 도전하려는 편이다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "불확실성을 기회로 삼아 도전한다.",
+    "right_statement": "불확실성을 줄이고 예측 가능성을 높이는 데 주력한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "F16",
+    "id": "FLX_08",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "변화가 있을 때 나는 적극적으로 대응하는 편이다."
+    "left_label": "Change",
+    "right_label": "System",
+    "left_statement": "변화가 있을 때 적극적으로 대응한다.",
+    "right_statement": "변화보다 기존 방식의 안정성을 우선시한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D17",
+    "id": "DIR_01",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "리더의 가장 중요한 역할은 목표를 달성하는 것이라고 생각한다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "목표 달성이 리더의 가장 중요한 역할이라고 본다.",
+    "right_statement": "팀원의 만족과 관계 유지가 리더의 가장 중요한 역할이라고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D18",
+    "id": "DIR_02",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "성과 지표가 리더십의 성공을 가장 잘 보여준다고 느낀다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "성과 지표가 리더십의 성공을 증명한다고 본다.",
+    "right_statement": "신뢰와 팀워크가 리더십의 성공을 증명한다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D19",
+    "id": "DIR_03",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "구성원에게 도전적인 목표를 제시하는 것이 성과를 만든다고 본다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "구성원에게 도전적인 목표를 부여해 성과를 낸다.",
+    "right_statement": "구성원에게 정서적 지지를 제공해 성과를 낸다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D20",
+    "id": "DIR_04",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "목표 달성 여부가 리더 평가의 핵심이라고 생각한다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "목표 달성 여부가 리더 평가의 핵심이라고 본다.",
+    "right_statement": "팀원의 만족과 심리적 안전감이 리더 평가의 핵심이라고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D21",
+    "id": "DIR_05",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "결과를 만들지 못한다면 리더십의 의미가 약해진다고 느낀다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "결과를 만들지 못하면 리더십은 의미가 없다고 본다.",
+    "right_statement": "관계를 해치면 리더십은 의미가 없다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D22",
+    "id": "DIR_06",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "목표를 달성해야 리더로서 인정받을 수 있다고 생각한다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "목표를 달성해야 리더십이 인정받는다고 본다.",
+    "right_statement": "관계가 유지되어야 리더십이 인정받는다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D23",
+    "id": "DIR_07",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "성과에 대한 보상이 구성원의 동기를 가장 크게 자극한다고 본다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "성과 보상이 구성원의 동기를 자극한다고 본다.",
+    "right_statement": "정서적 안정이 구성원의 동기를 자극한다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "D24",
+    "id": "DIR_08",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "성과 중심의 회의와 점검이 리더십의 본질에 가깝다고 느낀다."
+    "left_label": "Results",
+    "right_label": "People",
+    "left_statement": "성과 중심 회의가 리더십의 본질이라고 본다.",
+    "right_statement": "심리적 안전감이 리더십의 본질이라고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C25",
+    "id": "COM_01",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "리더는 방향을 명확히 제시하고 구성원은 이를 따르는 것이 효율적이라고 본다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "리더는 방향을 명확히 지시하고 구성원은 따른다고 본다.",
+    "right_statement": "리더는 합의를 통해 결정을 도출한다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C26",
+    "id": "COM_02",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 지시와 통제가 업무 효율을 높인다고 느낀다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "지시와 통제가 효율성을 높인다고 본다.",
+    "right_statement": "참여와 협의가 효율성을 높인다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C27",
+    "id": "COM_03",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 주로 일방적으로 방향을 제시하는 편이다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "방향은 주로 일방적으로 전달한다.",
+    "right_statement": "피드백과 의견 교환을 중시한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C28",
+    "id": "COM_04",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "구성원에게는 명확한 역할과 지시를 전달하는 것이 중요하다고 본다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "구성원에게 명확한 역할만 전달한다.",
+    "right_statement": "구성원의 의견을 듣고 반영한다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C29",
+    "id": "COM_05",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "리더의 권위는 분명한 지시를 통해 유지된다고 생각한다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "리더의 권위는 지시에 의해 유지된다고 본다.",
+    "right_statement": "리더의 권위는 권한 위임에 의해 강화된다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C30",
+    "id": "COM_06",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "구성원에게는 구체적인 지시가 필요하다고 느낀다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "구성원에게는 구체적인 지시가 필요하다고 본다.",
+    "right_statement": "구성원에게는 자율과 책임이 필요하다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C31",
+    "id": "COM_07",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "명확한 지시가 혼선을 줄이고 실행력을 높인다고 본다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "명확한 지시로 혼선을 방지한다.",
+    "right_statement": "자율적 결정을 통해 혁신이 촉진된다고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   },
   {
-    "id": "C32",
+    "id": "COM_08",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 통제가 성과를 만드는 핵심 요소라고 생각한다."
+    "left_label": "Direct",
+    "right_label": "Engage",
+    "left_statement": "통제가 성과의 핵심이라고 본다.",
+    "right_statement": "자율이 성과의 핵심이라고 본다.",
+    "scale": { "min": 1, "max": 7, "midpoint": 4 }
   }
 ]
