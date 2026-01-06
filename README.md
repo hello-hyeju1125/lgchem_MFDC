@@ -68,13 +68,13 @@ lgchem_MFDC/
 1. **동기부여 (Motivation)**: Intrinsic (I) vs Extrinsic (E)
 2. **유연성 (Flexibility)**: Change (C) vs System (S)
 3. **리더십 방향성 (Direction)**: Results (R) vs People (P)
-4. **소통 방식 (Communication)**: Direct (D) vs Engage (E)
+4. **소통 방식 (Communication)**: Direct (D) vs eNgage (N)
 
 ### 결과 코드 형식
 
-[I/E][C/S][R/P][D/E] - 총 16가지 유형
+[I/E][C/S][R/P][D/N] - 총 16가지 유형
 
-예: ICRD, ESPE 등
+예: ICRD, ESPN 등
 
 **동점 처리:**
 - 한 축에서 양쪽 극성의 점수가 동일한 경우 'X'로 표시 (예: IXRD, ECXD)

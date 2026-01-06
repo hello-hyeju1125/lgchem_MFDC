@@ -27,8 +27,12 @@ CREATE TABLE IF NOT EXISTS responses (
   session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   
+  -- 참여자 기본 정보
+  participant_name TEXT,   -- 이름
+  participant_email TEXT,  -- 이메일 주소
+  
   -- 계산된 결과
-  leadership_type TEXT NOT NULL,  -- 16유형 코드 (예: "ICRD", "ESPE" 등)
+  leadership_type TEXT NOT NULL,  -- 16유형 코드 (예: "ICRD", "ESPN" 등)
   axis_scores JSONB NOT NULL,  -- 4축 점수: { motivation: { intrinsic: 5.2, extrinsic: 4.8 }, ... }
   pole JSONB NOT NULL,  -- 각 축의 우세 극성: { motivation: "intrinsic", flexibility: "change", ... }
   

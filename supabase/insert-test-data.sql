@@ -13,10 +13,10 @@ DO $$
 DECLARE
   v_session_id UUID;
   v_leadership_types TEXT[] := ARRAY[
-    'ICRD', 'ICRE', 'ICPD', 'ICPE',
-    'ISRD', 'ISRE', 'ISPD', 'ISPE',
-    'ECRD', 'ECRE', 'ECPD', 'ECPE',
-    'ESRD', 'ESRE', 'ESPD', 'ESPE'
+    'ICRD', 'ICRN', 'ICPD', 'ICPN',
+    'ISRD', 'ISRN', 'ISPD', 'ISPN',
+    'ECRD', 'ECRN', 'ECPD', 'ECPN',
+    'ESRD', 'ESRN', 'ESPD', 'ESPN'
   ];
   v_type_distribution INT[] := ARRAY[4, 3, 4, 3, 3, 3, 4, 3, 3, 3, 4, 3, 3, 3, 3, 3]; -- 총 50개
   v_type_index INT := 1;
@@ -56,7 +56,7 @@ BEGIN
     v_motivation_pole := CASE WHEN substring(v_type, 1, 1) = 'I' THEN 'intrinsic' ELSE 'extrinsic' END;
     v_flexibility_pole := CASE WHEN substring(v_type, 2, 1) = 'C' THEN 'change' ELSE 'system' END;
     v_direction_pole := CASE WHEN substring(v_type, 3, 1) = 'R' THEN 'results' ELSE 'people' END;
-    v_communication_pole := CASE WHEN substring(v_type, 4, 1) = 'D' THEN 'direct' ELSE 'engage' END;
+    v_communication_pole := CASE WHEN substring(v_type, 4, 1) = 'D' THEN 'direct' ELSE 'engage' END; -- 'N'도 'engage'로 처리
     
     -- 각 유형에 맞는 점수 생성 (해당 극성이 더 높도록)
     FOR i IN 1..v_count LOOP

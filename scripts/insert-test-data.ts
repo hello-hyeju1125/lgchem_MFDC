@@ -37,10 +37,10 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // 16가지 리더십 유형
 const leadershipTypes = [
-  'ICRD', 'ICRE', 'ICPD', 'ICPE',
-  'ISRD', 'ISRE', 'ISPD', 'ISPE',
-  'ECRD', 'ECRE', 'ECPD', 'ECPE',
-  'ESRD', 'ESRE', 'ESPD', 'ESPE'
+  'ICRD', 'ICRN', 'ICPD', 'ICPN',
+  'ISRD', 'ISRN', 'ISPD', 'ISPN',
+  'ECRD', 'ECRN', 'ECPD', 'ECPN',
+  'ESRD', 'ESRN', 'ESPD', 'ESPN'
 ];
 
 // 각 유형별 개수 (총 50개)
@@ -52,7 +52,7 @@ function getPolesFromType(type: string) {
     motivation: type[0] === 'I' ? 'intrinsic' : 'extrinsic',
     flexibility: type[1] === 'C' ? 'change' : 'system',
     direction: type[2] === 'R' ? 'results' : 'people',
-    communication: type[3] === 'D' ? 'direct' : 'engage',
+    communication: type[3] === 'D' ? 'direct' : 'engage', // 'N'도 'engage'로 처리
   };
 }
 

@@ -1,6 +1,8 @@
 const STORAGE_KEY = 'lgchem_mfdc_answers';
 const STORAGE_KEY_CURRENT_INDEX = 'lgchem_mfdc_current_index';
 const STORAGE_KEY_SESSION_CODE = 'lgchem_mfdc_session_code';
+const STORAGE_KEY_PARTICIPANT_NAME = 'lgchem_mfdc_participant_name';
+const STORAGE_KEY_PARTICIPANT_EMAIL = 'lgchem_mfdc_participant_email';
 const STORAGE_KEY_CLIENT_HASH = 'lgchem_mfdc_client_hash';
 
 export interface Answers {
@@ -47,6 +49,23 @@ export const storage = {
       return localStorage.getItem(STORAGE_KEY_SESSION_CODE);
     }
     return null;
+  },
+
+  saveParticipantInfo: (name: string, email: string): void => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY_PARTICIPANT_NAME, name);
+      localStorage.setItem(STORAGE_KEY_PARTICIPANT_EMAIL, email);
+    }
+  },
+
+  loadParticipantInfo: (): { name: string | null; email: string | null } => {
+    if (typeof window !== 'undefined') {
+      return {
+        name: localStorage.getItem(STORAGE_KEY_PARTICIPANT_NAME),
+        email: localStorage.getItem(STORAGE_KEY_PARTICIPANT_EMAIL),
+      };
+    }
+    return { name: null, email: null };
   },
 
   getOrCreateClientHash: (): string => {

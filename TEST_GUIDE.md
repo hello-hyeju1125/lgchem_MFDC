@@ -67,7 +67,7 @@ curl -X POST http://localhost:3005/api/submit -H "Content-Type: application/json
 
 **참고:** 포트 번호(3005)와 세션 코드(test-session-001)를 실제 값으로 변경하세요.
 
-**다른 유형 테스트 (ESPE 유형 - 반대 극성) - 한 줄 버전:**
+**다른 유형 테스트 (ESPN 유형 - 반대 극성) - 한 줄 버전:**
 
 ```bash
 curl -X POST http://localhost:3005/api/submit -H "Content-Type: application/json" -d '{"sessionCode":"test-session-001","answers":{"M1":2,"M2":1,"M3":2,"M4":1,"M5":2,"M6":1,"M7":2,"M8":1,"F9":1,"F10":2,"F11":1,"F12":2,"F13":1,"F14":2,"F15":1,"F16":2,"D17":1,"D18":2,"D19":1,"D20":2,"D21":1,"D22":2,"D23":1,"D24":2,"C25":2,"C26":1,"C27":2,"C28":1,"C29":2,"C30":1,"C31":2,"C32":1}}'
@@ -146,7 +146,7 @@ fetch('http://localhost:3005/api/submit', {
       {
         "axis": "Communication",
         "dimension1": "Direct",
-        "dimension2": "Engage",
+        "dimension2": "eNgage",
         "score1": 6.25,
         "score2": 1.75,
         "dominant": "Direct"
@@ -205,7 +205,7 @@ http://localhost:3005/api/admin/aggregates?session_code=test-session-001&admin_k
         "ratio": 0.6667
       },
       {
-        "type": "ESPE",
+        "type": "ESPN",
         "count": 1,
         "ratio": 0.3333
       }

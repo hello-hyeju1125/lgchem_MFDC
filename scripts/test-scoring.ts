@@ -46,7 +46,7 @@ const testCases = [
     expectedCode: 'XCRD', // Motivation이 동점이므로 'X'
   },
   {
-    name: '반대 극성 케이스: ESPE 유형',
+    name: '반대 극성 케이스: ESPN 유형',
     answers: {
       // Motivation: 낮은 점수 (Extrinsic, 역채점으로 인해)
       M1: 1, M2: 2, M3: 1, M4: 2, M5: 1, M6: 2, M7: 1, M8: 2,
@@ -54,10 +54,10 @@ const testCases = [
       F9: 2, F10: 1, F11: 2, F12: 1, F13: 2, F14: 1, F15: 2, F16: 1,
       // Direction: 낮은 점수 (People, 역채점으로 인해)
       D17: 1, D18: 2, D19: 1, D20: 2, D21: 1, D22: 2, D23: 1, D24: 2,
-      // Communication: 낮은 점수 (Engage, 역채점으로 인해)
+      // Communication: 낮은 점수 (eNgage, 역채점으로 인해)
       C25: 2, C26: 1, C27: 2, C28: 1, C29: 2, C30: 1, C31: 2, C32: 1,
     } as Answers,
-    expectedCode: 'ESPE',
+    expectedCode: 'ESPN',
   },
   {
     name: '엣지 케이스: 최소값 (모두 1점)',
@@ -67,7 +67,7 @@ const testCases = [
       D17: 1, D18: 1, D19: 1, D20: 1, D21: 1, D22: 1, D23: 1, D24: 1,
       C25: 1, C26: 1, C27: 1, C28: 1, C29: 1, C30: 1, C31: 1, C32: 1,
     } as Answers,
-    expectedCode: 'ESPE', // 역채점으로 인해 반대 극성
+    expectedCode: 'ESPN', // 역채점으로 인해 반대 극성
   },
   {
     name: '엣지 케이스: 최대값 (모두 7점)',

@@ -49,7 +49,7 @@ bash scripts/test-api.sh
 
 ### 2-2. 또는 다른 유형으로 테스트
 
-터미널에서 다음 명령어로 다른 유형(ESPE)을 제출해보세요:
+터미널에서 다음 명령어로 다른 유형(ESPN)을 제출해보세요:
 
 ```bash
 curl -X POST http://localhost:3005/api/submit -H "Content-Type: application/json" -d '{"sessionCode":"test-session-001","answers":{"M1":2,"M2":1,"M3":2,"M4":1,"M5":2,"M6":1,"M7":2,"M8":1,"F9":1,"F10":2,"F11":1,"F12":2,"F13":1,"F14":2,"F15":1,"F16":2,"D17":1,"D18":2,"D19":1,"D20":2,"D21":1,"D22":2,"D23":1,"D24":2,"C25":2,"C26":1,"C27":2,"C28":1,"C29":2,"C30":1,"C31":2,"C32":1}}'
@@ -93,7 +93,7 @@ curl "http://localhost:3005/api/admin/aggregates?session_code=test-session-001&a
     "totalResponses": 3,
     "typeDistribution": [
       { "type": "ICRD", "count": 2, "ratio": 0.6667 },
-      { "type": "ESPE", "count": 1, "ratio": 0.3333 }
+      { "type": "ESPN", "count": 1, "ratio": 0.3333 }
     ],
     "axisStats": [
       {
