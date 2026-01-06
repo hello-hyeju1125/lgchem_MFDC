@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { storage } from '@/lib/storage';
 import { calculateScores } from '@/lib/scoring';
@@ -9,9 +9,18 @@ export default function ResultPage() {
   const router = useRouter();
   const [status, setStatus] = useState<'calculating' | 'submitting' | 'error'>('calculating');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const hasSubmittedRef = useRef(false); // 중복 제출 방지 플래그
 
   useEffect(() => {
+    // 이미 제출이 진행 중이거나 완료된 경우 중복 실행 방지
+    if (hasSubmittedRef.current) {
+      return;
+    }
+
     const submitAndNavigate = async () => {
+      // 제출 시작 플래그 설정
+      hasSubmittedRef.current = true;
+
       try {
         // 1. 답변 로드
         const answers = storage.loadAnswers();
@@ -22,13 +31,15 @@ export default function ResultPage() {
           return;
         }
 
-        // 2. 세션 코드 확인
+        // 2. 세션 코드 및 참여자 정보 확인
         const sessionCode = storage.loadSessionCode();
         if (!sessionCode) {
           setStatus('error');
           setErrorMessage('세션 코드가 없습니다. 진단을 다시 시작해주세요.');
           return;
         }
+
+        const { name, email } = storage.loadParticipantInfo();
 
         // 3. 점수 계산
         const calculatedResult = calculateScores(answers);
@@ -46,6 +57,8 @@ export default function ResultPage() {
             sessionCode,
             answers,
             clientHash,
+            participantName: name || null,
+            participantEmail: email || null,
           }),
         });
 
@@ -55,6 +68,7 @@ export default function ResultPage() {
           // 제출 실패 시 에러 표시 (재시도 버튼 포함)
           setStatus('error');
           setErrorMessage(result.error || '제출에 실패했습니다. 네트워크 연결을 확인해주세요.');
+          hasSubmittedRef.current = false; // 실패 시 플래그 리셋하여 재시도 가능하게
           return;
         }
 
@@ -64,6 +78,7 @@ export default function ResultPage() {
         console.error('제출 중 오류:', error);
         setStatus('error');
         setErrorMessage('예상치 못한 오류가 발생했습니다. 다시 시도해주세요.');
+        hasSubmittedRef.current = false; // 실패 시 플래그 리셋하여 재시도 가능하게
       }
     };
 
@@ -84,7 +99,8 @@ export default function ResultPage() {
             <p className="text-red-600 font-semibold text-lg sm:text-xl mb-4">{errorMessage}</p>
             <button
               onClick={() => {
-                // 페이지 리로드하여 다시 제출 시도
+                // 플래그 리셋 후 페이지 리로드하여 다시 제출 시도
+                hasSubmittedRef.current = false;
                 window.location.reload();
               }}
               className="px-6 py-3 bg-gradient-to-r from-brand-purple to-brand-magenta text-white font-semibold rounded-xl hover:opacity-90 transition-opacity shadow-lg"

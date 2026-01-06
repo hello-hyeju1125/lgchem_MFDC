@@ -25,7 +25,6 @@ function TestPageContent() {
   
   // 세션 코드 상태
   const [sessionCode, setSessionCode] = useState<string | null>(null);
-  const [sessionCodeInput, setSessionCodeInput] = useState('');
   const [sessionValidating, setSessionValidating] = useState(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
   const [sessionTitle, setSessionTitle] = useState<string | null>(null);
@@ -107,16 +106,6 @@ function TestPageContent() {
     }
   }, [sessionCode]);
   
-  // 세션 코드 입력 핸들러
-  const handleSessionCodeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sessionCodeInput.trim()) {
-      setSessionError('세션 코드를 입력해주세요');
-      return;
-    }
-    await validateSessionCode(sessionCodeInput.trim());
-  };
-
   const totalQuestions = questions.length;
   const currentPartInfo = PARTS[currentPart];
   const partQuestions = questions.slice(currentPartInfo.start, currentPartInfo.end + 1);
@@ -161,20 +150,28 @@ function TestPageContent() {
     const currentQuestionIndex = questions.findIndex(q => q.id === questionId);
     const nextIndex = currentQuestionIndex + 1;
     
-    // 다음 문항이 현재 파트 내에 있고, 아직 답변하지 않은 경우
-    if (nextIndex <= currentPartInfo.end) {
-      // 다음 문항으로 스크롤 및 활성화
+    // 다음 문항이 있는지 확인
+    if (nextIndex < totalQuestions) {
+      // 다음 문항으로 이동
       setTimeout(() => {
-        const nextElement = questionRefs.current[nextIndex];
-        if (nextElement) {
-          nextElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center',
-            inline: 'nearest'
-          });
-        }
         setActiveIndex(nextIndex);
         storage.saveCurrentIndex(nextIndex);
+        
+        // 다음 문항이 다른 파트에 있으면 파트 변경
+        const nextPart = PARTS.findIndex(part => 
+          nextIndex >= part.start && nextIndex <= part.end
+        );
+        if (nextPart !== -1 && nextPart !== currentPart) {
+          setCurrentPart(nextPart);
+        }
+        
+        // 스크롤을 맨 위로
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 300);
+    } else {
+      // 모든 문항 완료 - 결과 페이지로 이동
+      setTimeout(() => {
+        router.push('/result');
       }, 300);
     }
   };
@@ -233,24 +230,54 @@ function TestPageContent() {
     }
   };
 
-  // 현재 파트의 문항들 렌더링
-  const getVisibleQuestions = () => {
-    const visible = [];
-    const nextUnanswered = getNextUnansweredInPart();
-    
-    // 현재 파트의 모든 문항 표시
-    for (let i = currentPartInfo.start; i <= currentPartInfo.end; i++) {
-      visible.push(i);
+  // 현재 활성 문항만 표시
+  const currentQuestion = questions[activeIndex];
+  const isLastQuestion = activeIndex === totalQuestions - 1;
+  const isFirstQuestion = activeIndex === 0;
+
+  // 이전 문항으로 이동
+  const handlePreviousQuestion = () => {
+    if (activeIndex > 0) {
+      const prevIndex = activeIndex - 1;
+      setActiveIndex(prevIndex);
+      storage.saveCurrentIndex(prevIndex);
+      
+      // 이전 문항이 다른 파트에 있으면 파트 변경
+      const prevPart = PARTS.findIndex(part => 
+        prevIndex >= part.start && prevIndex <= part.end
+      );
+      if (prevPart !== -1 && prevPart !== currentPart) {
+        setCurrentPart(prevPart);
+      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    
-    return visible;
   };
 
-  const visibleIndices = getVisibleQuestions();
-  const isPartComplete = getNextUnansweredInPart() === null;
+  // 다음 문항으로 이동
+  const handleNextQuestion = () => {
+    if (activeIndex < totalQuestions - 1) {
+      const nextIndex = activeIndex + 1;
+      setActiveIndex(nextIndex);
+      storage.saveCurrentIndex(nextIndex);
+      
+      // 다음 문항이 다른 파트에 있으면 파트 변경
+      const nextPart = PARTS.findIndex(part => 
+        nextIndex >= part.start && nextIndex <= part.end
+      );
+      if (nextPart !== -1 && nextPart !== currentPart) {
+        setCurrentPart(nextPart);
+      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // 모든 문항 완료 - 결과 페이지로 이동
+      router.push('/result');
+    }
+  };
 
-  // 세션 코드가 없거나 검증 중인 경우 입력 화면 표시
-  if (!sessionCode || sessionValidating) {
+  // 세션 코드 검증 중인 경우 로딩 화면 표시
+  if (sessionValidating) {
     return (
       <main className="min-h-screen py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-hidden flex items-center justify-center">
         {/* 배경 그라데이션 */}
@@ -263,48 +290,18 @@ function TestPageContent() {
         <div className="w-full max-w-md mx-auto relative z-10">
           <div className="glass-premium rounded-3xl p-8 shadow-xl">
             <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-brand-purple to-brand-magenta bg-clip-text text-transparent text-center">
-              리더십 진단 시작
+              리더십 진단 준비 중
             </h1>
             <p className="text-gray-600 text-center mb-6">
-              세션 코드를 입력해주세요
+              세션 정보를 확인하고 있습니다. 잠시만 기다려 주세요.
             </p>
-            
-            {sessionValidating ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-light-gray/30 border-t-brand-purple mx-auto mb-4" />
-                <p className="text-gray-600">세션 코드를 확인하는 중...</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSessionCodeSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="sessionCode" className="block text-sm font-semibold text-gray-700 mb-2">
-                    세션 코드
-                  </label>
-                  <input
-                    id="sessionCode"
-                    type="text"
-                    value={sessionCodeInput}
-                    onChange={(e) => {
-                      setSessionCodeInput(e.target.value);
-                      setSessionError(null);
-                    }}
-                    placeholder="예: LGCH-20260110-AM"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-purple/50 focus:border-brand-purple bg-white/80 text-gray-800"
-                    autoFocus
-                  />
-                  {sessionError && (
-                    <p className="mt-2 text-sm text-red-600">{sessionError}</p>
-                  )}
-                </div>
-                
-                <button
-                  type="submit"
-                  className="w-full py-3 px-6 bg-gradient-to-r from-brand-purple to-brand-magenta text-white font-semibold rounded-xl hover:opacity-90 transition-opacity shadow-lg"
-                >
-                  시작하기
-                </button>
-              </form>
-            )}
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-light-gray/30 border-t-brand-purple mx-auto mb-4" />
+              <p className="text-gray-600">세션 코드를 확인하는 중...</p>
+              {sessionError && (
+                <p className="mt-3 text-sm text-red-600">{sessionError}</p>
+              )}
+            </div>
           </div>
         </div>
       </main>
@@ -329,87 +326,70 @@ function TestPageContent() {
             <p className="text-sm text-gray-600">세션: <span className="font-semibold text-gray-800">{sessionTitle}</span></p>
           </div>
         )}
-        <div className="mb-6 sm:mb-8 md:mb-10 animate-fade-in">
+        <div className="mb-3 sm:mb-4 md:mb-5 animate-fade-in">
           <ProgressBar current={progress} total={totalQuestions} />
-          <div className="mt-4 text-center">
-            <span className="text-sm sm:text-base md:text-lg font-semibold text-gray-600">
-              파트 {currentPart + 1}/4 ({currentPartInfo.label})
-            </span>
-            <div className="mt-3 sm:mt-4 text-center">
-              <span className="text-xs sm:text-sm md:text-base text-gray-500 font-bold">
-                1: 매우 그렇지 않다 &nbsp;&nbsp;&nbsp; 7: 매우 그렇다
-              </span>
+          <div className="mt-2 sm:mt-2 text-center">
+            <div className="mt-1.5 sm:mt-2 text-center">
+              <p className="text-[15.6px] sm:text-[18.2px] md:text-[20.8px] text-gray-600 font-medium px-4 break-keep">
+                아래 두 문장 중, 당신의 실제 리더십 행동에 더 가까운 쪽을 선택해주세요.
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="space-y-9 sm:space-y-14 md:space-y-16">
-          {visibleIndices.map((index) => {
-            const question = questions[index];
-            const isAnswered = isQuestionAnswered(index);
-            const nextUnanswered = getNextUnansweredInPart();
-            const isActive = nextUnanswered !== null ? index === nextUnanswered : isAnswered && index === activeIndex;
-            // 다음 답변하지 않은 문항보다 뒤에 있는 모든 문항을 비활성화
-            const isDisabled = nextUnanswered !== null && index > nextUnanswered;
-            
-            return (
-              <div
-                key={question.id}
-                ref={(el) => {
-                  questionRefs.current[index] = el;
-                }}
-                className={`transition-all duration-500 ease-out ${
-                  isDisabled 
-                    ? 'opacity-30 pointer-events-none grayscale' 
-                    : isActive 
-                    ? 'opacity-100 scale-100 translate-y-0' 
-                    : isAnswered
-                    ? 'opacity-100 scale-100 translate-y-0'
-                    : 'opacity-60 scale-95 translate-y-2'
-                }`}
-              >
-                <QuestionCard
-                  statement={question.statement}
-                  value={answers[question.id] || null}
-                  onChange={(value) => handleAnswerChange(question.id, value)}
-                  disabled={isDisabled}
-                />
-              </div>
-            );
-          })}
+        <div className="flex flex-col items-center justify-center min-h-[45vh] py-3 sm:py-4">
+          {currentQuestion && (
+            <div className="w-full max-w-4xl">
+              <QuestionCard
+                leftLabel={currentQuestion.left_label}
+                rightLabel={currentQuestion.right_label}
+                leftStatement={currentQuestion.left_statement}
+                rightStatement={currentQuestion.right_statement}
+                value={answers[currentQuestion.id] || null}
+                onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+                disabled={false}
+              />
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-8 sm:mt-10 md:mt-12 gap-4 sm:gap-6 animate-fade-in">
-          {isPartComplete && (
+        <div className="flex flex-row justify-between items-center mt-8 sm:mt-10 md:mt-12 gap-3 sm:gap-6 animate-fade-in">
+          <button
+            onClick={isFirstQuestion ? () => router.push('/') : handlePreviousQuestion}
+            className="glass-premium text-gray-700 px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-sm sm:text-lg md:text-xl transition-all duration-300 active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+          >
+            <span className="flex items-center justify-center whitespace-nowrap">
+              {isFirstQuestion ? '← 메인으로' : '← 이전 문항'}
+            </span>
+          </button>
+          
+          {!isLastQuestion && (
             <button
-              onClick={handleNextPart}
-              className="px-8 sm:px-10 md:px-12 py-4 sm:py-5 rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl w-full sm:w-auto order-1 sm:order-2"
+              onClick={handleNextQuestion}
+              className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-sm sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
             >
-              <span className="flex items-center justify-center gap-2 sm:gap-3">
-                {currentPart < PARTS.length - 1 ? (
-                  <>
-                    다음 파트로
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 transform sm:group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </>
-                ) : (
-                  <>
-                    결과 보기
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </>
-                )}
+              <span className="flex items-center justify-center gap-1 sm:gap-3 whitespace-nowrap">
+                다음 문항
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 transform sm:group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
               </span>
             </button>
           )}
-          <button
-            onClick={currentPart > 0 ? handlePreviousPart : () => router.push('/')}
-            className="glass-premium text-gray-700 px-8 sm:px-10 md:px-12 py-4 sm:py-5 rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl transition-all duration-300 active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl w-full sm:w-auto order-2 sm:order-1"
-          >
-            {currentPart > 0 ? '← 이전 파트' : '← 메인으로'}
-          </button>
+          
+          {isLastQuestion && answers[currentQuestion?.id] && (
+            <button
+              onClick={() => router.push('/result')}
+              className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-sm sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
+            >
+              <span className="flex items-center justify-center gap-1 sm:gap-3 whitespace-nowrap">
+                결과 보기
+                <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </main>

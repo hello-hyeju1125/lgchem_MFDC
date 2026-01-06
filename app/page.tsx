@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { storage } from '@/lib/storage';
 
 function TypingText({ text, className }: { text: string; className?: string }) {
   const [displayedText, setDisplayedText] = useState('');
@@ -30,6 +31,42 @@ function TypingText({ text, className }: { text: string; className?: string }) {
 }
 
 export default function Home() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [sessionCode, setSessionCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const router = useRouter();
+
+  const validateEmail = (email: string): boolean => {
+    // RFC 5322 표준 이메일 형식 검증 (백엔드 Zod .email() 검증과 유사)
+    // @ 기호 포함 및 기본적인 이메일 형식 체크
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  };
+
+  const handleStart = () => {
+    if (!name.trim() || !email.trim() || !sessionCode.trim()) {
+      setError('이름, 이메일, 세션 코드를 모두 입력해 주세요.');
+      return;
+    }
+
+    // 이메일 유효성 검사 (@ 포함 여부)
+    if (!validateEmail(email.trim())) {
+      setShowEmailModal(true);
+      return;
+    }
+
+    setError(null);
+
+    // 참여자 정보 및 세션 코드 저장
+    storage.saveParticipantInfo(name.trim(), email.trim());
+    storage.saveSessionCode(sessionCode.trim());
+
+    // 세션 코드를 포함하여 테스트 페이지로 이동 (백엔드 검증용)
+    router.push(`/test?session=${encodeURIComponent(sessionCode.trim())}`);
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden">
       {/* Wave 배경 요소 - 그레이, 마젠타, 퍼플 */}
@@ -149,10 +186,10 @@ export default function Home() {
                     <span className="font-bold text-sm sm:text-base md:text-lg">32개 문항</span>을 통해 <span className="font-bold text-sm sm:text-base md:text-lg">16가지 리더십 유형</span>을 도출합니다.
                     <br className="hidden sm:block" />
                     <span className="sm:hidden"> </span>
-                    각 문항은 1~7점 리커트 척도로 응답하며,
+                    각 문항은 서로 반대되는 두 리더십 방식을 제시하며,
                     <br className="hidden sm:block" />
                     <span className="sm:hidden"> </span>
-                    한쪽 극단이 아닌 개인의 실제 성향에 가까운 위치를 측정합니다.
+                    당신의 실제 행동에 더 가까운 쪽을 7점 척도로 선택합니다.
                   </p>
                 </div>
               </div>
@@ -179,9 +216,65 @@ export default function Home() {
           </div>
         </div>
         
+        {/* 기본 정보 입력 영역 */}
+        <div className="animate-fade-in mb-5 sm:mb-6" style={{ animationDelay: '0.1s' }}>
+          <div className="glass-card rounded-2xl sm:rounded-3xl px-4 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6 max-w-xl mx-auto text-left">
+            <p className="text-sm sm:text-base text-gray-700 font-medium mb-3 sm:mb-4">
+              진단을 진행하기 전에 아래 정보를 입력해 주세요.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div>
+                <label className="block text-xs sm:text-sm text-gray-600 mb-1.5">
+                  이름
+                  <span className="text-brand-magenta ml-0.5">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="예: 홍길동"
+                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow"
+                />
+              </div>
+              <div>
+                <label className="block text-xs sm:text-sm text-gray-600 mb-1.5">
+                  이메일 주소
+                  <span className="text-brand-magenta ml-0.5">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="예: hong.gildong@lgchem.com"
+                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow"
+                />
+              </div>
+              <div>
+                <label className="block text-xs sm:text-sm text-gray-600 mb-1.5">
+                  세션 코드
+                  <span className="text-brand-magenta ml-0.5">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={sessionCode}
+                  onChange={(e) => setSessionCode(e.target.value)}
+                  placeholder="운영자가 안내한 코드를 입력해 주세요."
+                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-magenta/60 focus:border-brand-magenta/60 transition-shadow tracking-widest"
+                />
+              </div>
+            </div>
+            {error && (
+              <p className="mt-3 text-xs sm:text-sm text-red-600">
+                {error}
+              </p>
+            )}
+          </div>
+        </div>
+
         <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <Link
-            href="/test"
+          <button
+            type="button"
+            onClick={handleStart}
             className="inline-block rounded-full text-white font-bold text-base sm:text-lg md:text-xl w-full sm:w-auto px-10 sm:px-14 md:px-16 py-4 sm:py-5 md:py-6 transition-all duration-300 group relative overflow-hidden hover:-translate-y-1 active:translate-y-0"
             style={{ 
               boxShadow: '0 20px 25px -5px rgba(85, 29, 131, 0.4), 0 10px 10px -5px rgba(85, 29, 131, 0.3)'
@@ -206,9 +299,26 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </span>
-          </Link>
+          </button>
         </div>
       </div>
+
+      {/* 이메일 유효성 검사 팝업 모달 */}
+      {showEmailModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowEmailModal(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full animate-scale-in shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-sm sm:text-base text-gray-700 text-center">
+              올바른 이메일 주소 형식으로 입력해주세요
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

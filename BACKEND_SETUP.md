@@ -155,7 +155,7 @@ curl "http://localhost:3000/api/admin/aggregates?session_code=test-session-001&a
     "totalResponses": 25,
     "typeDistribution": [
       { "type": "ICRD", "count": 12, "ratio": 0.48 },
-      { "type": "ECPE", "count": 8, "ratio": 0.32 },
+      { "type": "ECPN", "count": 8, "ratio": 0.32 },
       ...
     ],
     "axisStats": [

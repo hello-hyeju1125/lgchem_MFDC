@@ -14,7 +14,7 @@ const DIMENSION_DESCRIPTIONS: Record<string, string> = {
   Results: '성과 중심',
   People: '관계 중심',
   Direct: '지시형 소통',
-  Engage: '참여형 소통',
+  eNgage: '참여형 소통',
 };
 
 interface DevelopmentPoint {
@@ -282,93 +282,175 @@ export default function ResultCodePage() {
         <section className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
             {result.scores.map((axisScore, index) => {
-              // 브랜드 색상 팔레트를 활용한 축별 색상 조합
-              const colors = [
-                { from: 'from-brand-purple', to: 'to-brand-magenta', via: 'via-brand-purple' },
-                { from: 'from-brand-deep-blue', to: 'to-brand-light-blue', via: 'via-brand-deep-blue' },
-                { from: 'from-brand-magenta', to: 'to-brand-purple', via: 'via-brand-magenta' },
-                { from: 'from-brand-light-blue', to: 'to-brand-deep-blue', via: 'via-brand-light-blue' },
-              ];
-              const colorScheme = colors[index % colors.length];
+              // 축별 색상 조합 (좌우 그라데이션, 아래쪽 색상으로 구분)
+              const axisColors: Record<string, { from: string; to: string; fromColor: string; toColor: string }> = {
+                'Motivation': { 
+                  from: 'from-purple-600', 
+                  to: 'to-pink-500', 
+                  fromColor: '#9333ea', // 퍼플
+                  toColor: '#ec4899' // 마젠타
+                },
+                'Flexibility': { 
+                  from: 'from-green-500', 
+                  to: 'to-emerald-300', 
+                  fromColor: '#22c55e', // 그린
+                  toColor: '#6ee7b7' // 민트
+                },
+                'Direction': { 
+                  from: 'from-pink-500', 
+                  to: 'to-pink-300', 
+                  fromColor: '#ec4899', // 마젠타
+                  toColor: '#f9a8d4' // 핑크
+                },
+                'Communication': { 
+                  from: 'from-sky-400', 
+                  to: 'to-indigo-900', 
+                  fromColor: '#38bdf8', // 라이트 블루
+                  toColor: '#312e81' // 네이비
+                },
+              };
+              const colorScheme = axisColors[axisScore.axis] || axisColors['Motivation'];
+              
+              // 축별 제목
+              const axisTitles: Record<string, string> = {
+                'Motivation': '동기부여 방식',
+                'Flexibility': '유연성',
+                'Direction': '리더십 방향성',
+                'Communication': '소통 방식',
+              };
+              
+              // 퍼센트 계산
+              const totalScore = axisScore.score1 + axisScore.score2;
+              const percent1 = Math.round((axisScore.score1 / totalScore) * 100);
+              const percent2 = Math.round((axisScore.score2 / totalScore) * 100);
               
               return (
                 <div
                   key={axisScore.axis}
                   className="glass-premium rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 lg:p-12 sm:hover:scale-[1.02] transition-all duration-300"
                 >
-                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-700 mb-6 sm:mb-8 tracking-tight">
-                    {axisScore.axis === 'Motivation'
-                      ? '동기부여'
-                      : axisScore.axis === 'Flexibility'
-                      ? '유연성'
-                      : axisScore.axis === 'Direction'
-                      ? '리더십 방향성'
-                      : '소통 방식'}
+                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-700 mb-6 sm:mb-8 tracking-tight text-center">
+                    {axisTitles[axisScore.axis]}
                   </h3>
 
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <div className="flex justify-between items-center mb-3 sm:mb-4">
+                    {/* 양쪽 라벨 */}
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex flex-col items-start">
                         <span className="font-bold text-gray-700 text-base sm:text-lg md:text-xl tracking-tight">
                           {axisScore.dimension1}
                         </span>
-                        <span className={`font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r ${colorScheme.from} ${colorScheme.to} bg-clip-text text-transparent`}>
-                          {axisScore.score1}점
+                        <span className="text-sm sm:text-base text-gray-600 mt-1">
+                          {DIMENSION_DESCRIPTIONS[axisScore.dimension1]}
                         </span>
                       </div>
-                      <div className="w-full bg-brand-light-gray/30 rounded-full h-3 sm:h-4 overflow-hidden backdrop-blur-sm shadow-inner">
-                        <div
-                          className={`h-3 sm:h-4 rounded-full bg-gradient-to-r ${colorScheme.from} ${colorScheme.via} ${colorScheme.to} transition-all duration-700 ${
-                            axisScore.dominant === axisScore.dimension1
-                              ? 'opacity-100'
-                              : 'opacity-50'
-                          }`}
-                          style={{
-                            width: `${
-                              (axisScore.score1 /
-                                (axisScore.score1 + axisScore.score2)) *
-                              100
-                            }%`,
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
-                        </div>
-                      </div>
-                      <p className="text-sm sm:text-base md:text-lg text-gray-600 mt-2 sm:mt-3 font-normal leading-relaxed">
-                        {DIMENSION_DESCRIPTIONS[axisScore.dimension1]}
-                      </p>
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between items-center mb-3 sm:mb-4">
+                      <div className="flex flex-col items-end">
                         <span className="font-bold text-gray-700 text-base sm:text-lg md:text-xl tracking-tight">
                           {axisScore.dimension2}
                         </span>
-                        <span className={`font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r ${colorScheme.from} ${colorScheme.to} bg-clip-text text-transparent`}>
-                          {axisScore.score2}점
+                        <span className="text-sm sm:text-base text-gray-600 mt-1">
+                          {DIMENSION_DESCRIPTIONS[axisScore.dimension2]}
                         </span>
                       </div>
-                      <div className="w-full bg-brand-light-gray/30 rounded-full h-3 sm:h-4 overflow-hidden backdrop-blur-sm shadow-inner">
-                        <div
-                          className={`h-3 sm:h-4 rounded-full bg-gradient-to-r ${colorScheme.from} ${colorScheme.via} ${colorScheme.to} transition-all duration-700 ${
-                            axisScore.dominant === axisScore.dimension2
-                              ? 'opacity-100'
-                              : 'opacity-50'
-                          }`}
+                    </div>
+
+                    {/* 슬라이더 바 */}
+                    <div className="relative w-full">
+                      {/* 경계선을 가리키는 아래로 향하는 화살표 */}
+                      <div 
+                        className="absolute -top-6 sm:-top-7 md:-top-8 left-0 flex justify-center z-10 pointer-events-none"
+                        style={{ left: `${percent1}%`, transform: 'translateX(-50%)' }}
+                      >
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      
+                      <div className="relative flex items-center w-full h-10 sm:h-12 md:h-14 bg-brand-light-gray/20 rounded-full overflow-hidden">
+                        {/* 전체 그라데이션 배경 - 매우 부드러운 전환 (주요 레이어) */}
+                        <div 
+                          className="absolute inset-0 h-full transition-all duration-700 rounded-full z-0"
                           style={{
-                            width: `${
-                              (axisScore.score2 /
-                                (axisScore.score1 + axisScore.score2)) *
-                              100
-                            }%`,
+                            background: axisScore.axis === 'Communication'
+                              ? `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`
+                              : `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`
+                          }}
+                        />
+                        
+                        {/* 왼쪽 영역 - 반투명 오버레이로 경계 부드럽게 */}
+                        <div 
+                          className="relative h-full transition-all duration-700 rounded-l-full z-10"
+                          style={{ 
+                            width: `${percent1}%`,
+                            background: axisScore.axis === 'Communication' && percent1 > 0 && percent2 > 0
+                              ? `linear-gradient(to right, ${colorScheme.fromColor}cc, ${colorScheme.fromColor}77, ${colorScheme.fromColor}33, transparent)`
+                              : percent1 > 0 && percent2 > 0 
+                              ? `linear-gradient(to right, ${colorScheme.fromColor}ee, ${colorScheme.fromColor}88, transparent)`
+                              : `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.fromColor})`
                           }}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+                          {/* 위쪽 하이라이트 */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-l-full" />
                         </div>
+                        
+                        {/* 오른쪽 영역 - 반투명 오버레이로 경계 부드럽게 */}
+                        <div 
+                          className="relative h-full transition-all duration-700 rounded-r-full ml-auto z-10"
+                          style={{ 
+                            width: `${percent2}%`,
+                            background: axisScore.axis === 'Communication' && percent1 > 0 && percent2 > 0
+                              ? `linear-gradient(to left, ${colorScheme.toColor}cc, ${colorScheme.toColor}77, ${colorScheme.toColor}33, transparent)`
+                              : percent1 > 0 && percent2 > 0
+                              ? `linear-gradient(to left, ${colorScheme.toColor}ee, ${colorScheme.toColor}88, transparent)`
+                              : `linear-gradient(to left, ${colorScheme.toColor}, ${colorScheme.toColor})`
+                          }}
+                        >
+                          {/* 위쪽 하이라이트 */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-r-full" />
+                        </div>
+                        
+                        {/* 중간 경계 그라데이션 오버레이 - 매우 넓게 블렌딩하여 경계 완전히 숨김 */}
+                        {percent1 > 0 && percent2 > 0 && (
+                          <div 
+                            className="absolute top-0 bottom-0 pointer-events-none z-20"
+                            style={{
+                              left: `calc(${percent1}% - ${axisScore.axis === 'Communication' ? '60px' : '50px'})`,
+                              width: axisScore.axis === 'Communication' ? '120px' : '100px',
+                              background: axisScore.axis === 'Communication'
+                                ? `linear-gradient(to right, ${colorScheme.fromColor}00, ${colorScheme.fromColor}22, ${colorScheme.fromColor}55, ${colorScheme.fromColor}88, ${colorScheme.toColor}88, ${colorScheme.toColor}55, ${colorScheme.toColor}22, ${colorScheme.toColor}00)`
+                                : `linear-gradient(to right, ${colorScheme.fromColor}00, ${colorScheme.fromColor}44, ${colorScheme.fromColor}88, ${colorScheme.toColor}88, ${colorScheme.toColor}44, ${colorScheme.toColor}00)`
+                            }}
+                          />
+                        )}
                       </div>
-                      <p className="text-sm sm:text-base md:text-lg text-gray-600 mt-2 sm:mt-3 font-normal leading-relaxed">
-                        {DIMENSION_DESCRIPTIONS[axisScore.dimension2]}
-                      </p>
+                    </div>
+
+                    {/* 퍼센트 표시 */}
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex flex-col items-start">
+                        <span 
+                          className="font-bold text-lg sm:text-xl md:text-2xl bg-clip-text text-transparent"
+                          style={{ 
+                            backgroundImage: `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent'
+                          }}
+                        >
+                          {percent1}%
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span 
+                          className="font-bold text-lg sm:text-xl md:text-2xl bg-clip-text text-transparent"
+                          style={{ 
+                            backgroundImage: `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent'
+                          }}
+                        >
+                          {percent2}%
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

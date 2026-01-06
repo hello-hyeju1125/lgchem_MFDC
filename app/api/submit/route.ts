@@ -25,10 +25,27 @@ const SubmitSchema = z.object({
   answers: z
     .record(z.string(), z.number().int().min(1).max(7))
     .refine(
-      (answers) => Object.keys(answers).length === 32,
-      '32문항에 대한 응답이 모두 필요합니다'
+      (answers) => {
+        // null이나 undefined 값 제거
+        const validAnswers = Object.entries(answers).filter(
+          ([_, value]) => value !== null && value !== undefined && typeof value === 'number'
+        );
+        const count = validAnswers.length;
+        // 4번 닷이 제거되어 1,2,3,5,6,7만 선택 가능하므로 최소 30개 이상이어야 함
+        // 모든 문항(32개)에 답변했을 때를 기준으로 검증
+        return count >= 30 && count <= 32;
+      },
+      '30개 이상 32개 이하의 문항에 대한 응답이 필요합니다'
     ),
   clientHash: z.string().optional(), // 중복 제출 방지용 (선택사항)
+  participantName: z
+    .union([z.string().min(1), z.null()])
+    .optional()
+    .transform((val) => (val === '' ? null : val)),
+  participantEmail: z
+    .union([z.string().email(), z.null()])
+    .optional()
+    .transform((val) => (val === '' ? null : val)),
 });
 
 export async function POST(request: NextRequest) {
@@ -36,9 +53,30 @@ export async function POST(request: NextRequest) {
     // 요청 본문 파싱
     const body = await request.json();
 
+    // answers 객체에서 null/undefined 값 제거
+    if (body.answers && typeof body.answers === 'object') {
+      body.answers = Object.entries(body.answers).reduce((acc, [key, value]) => {
+        if (value !== null && value !== undefined && typeof value === 'number') {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+    }
+
+    // 디버깅: 제출된 데이터 로그
+    console.log('제출된 데이터:', {
+      sessionCode: body.sessionCode,
+      answersCount: body.answers ? Object.keys(body.answers).length : 0,
+      answersKeys: body.answers ? Object.keys(body.answers) : [],
+      answersValues: body.answers ? Object.values(body.answers) : [],
+      participantName: body.participantName,
+      participantEmail: body.participantEmail,
+    });
+
     // 입력 검증
     const validationResult = SubmitSchema.safeParse(body);
     if (!validationResult.success) {
+      console.error('검증 실패 상세:', validationResult.error.errors);
       return NextResponse.json(
         {
           success: false,
@@ -49,7 +87,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { sessionCode, answers, clientHash } = validationResult.data;
+    const { sessionCode, answers, clientHash, participantName, participantEmail } = validationResult.data;
 
     // session_code로 session_id 조회
     const { data: session, error: sessionError } = await supabaseAnonymous
@@ -98,6 +136,8 @@ export async function POST(request: NextRequest) {
         pole: pole,
         answers: answers, // 원본 데이터 (검증/디버깅용, 관리자 화면에 노출하지 않음)
         client_hash: clientHash || null,
+        participant_name: participantName ?? null,
+        participant_email: participantEmail ?? null,
       });
 
     if (insertError) {
