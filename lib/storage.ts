@@ -4,6 +4,7 @@ const STORAGE_KEY_SESSION_CODE = 'lgchem_mfdc_session_code';
 const STORAGE_KEY_PARTICIPANT_NAME = 'lgchem_mfdc_participant_name';
 const STORAGE_KEY_PARTICIPANT_EMAIL = 'lgchem_mfdc_participant_email';
 const STORAGE_KEY_CLIENT_HASH = 'lgchem_mfdc_client_hash';
+const STORAGE_KEY_SHUFFLED_ORDER = 'lgchem_mfdc_shuffled_order';
 
 export interface Answers {
   [questionId: string]: number;
@@ -85,12 +86,29 @@ export const storage = {
     return '';
   },
 
+  saveShuffledOrder: (sessionCode: string, order: string[]): void => {
+    if (typeof window !== 'undefined') {
+      const key = `${STORAGE_KEY_SHUFFLED_ORDER}_${sessionCode}`;
+      localStorage.setItem(key, JSON.stringify(order));
+    }
+  },
+
+  loadShuffledOrder: (sessionCode: string): string[] | null => {
+    if (typeof window !== 'undefined') {
+      const key = `${STORAGE_KEY_SHUFFLED_ORDER}_${sessionCode}`;
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : null;
+    }
+    return null;
+  },
+
   clearAll: (): void => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(STORAGE_KEY_CURRENT_INDEX);
       localStorage.removeItem(STORAGE_KEY_SESSION_CODE);
       // client_hash는 유지 (중복 제출 방지용)
+      // shuffled_order는 세션별로 관리되므로 여기서는 삭제하지 않음
     }
   },
 };

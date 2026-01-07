@@ -1,18 +1,17 @@
 /**
  * 리더십 진단 점수 계산 로직
  * 
- * 32문항의 응답(1~7점)을 입력받아 4개 축의 점수를 계산하고,
+ * 64문항의 응답(1~7점)을 입력받아 4개 축의 점수를 계산하고,
  * 각 축의 우세 극성을 판단하여 16가지 리더십 유형을 결정합니다.
  * 
- * 새로운 양극 선택형(Bipolar Forced-Choice) 방식:
- * - 각 문항은 서로 반대되는 두 리더십 방식을 제시
- * - 사용자가 1~7점 척도로 선택 (1: 좌측에 매우 가까움, 4: 균형적, 7: 우측에 매우 가까움)
- * - 선택 점수를 bipolar 값으로 변환: value = 선택 점수 - 4 (범위: -3 ~ +3)
- * - 각 축별 평균 bipolar 값을 계산하여 우세 극성 판단
+ * 새로운 7점 리커트 척도 방식:
+ * - 각 문항은 독립적으로 1~7점으로 평가
+ * - 각 축별로 dimension1과 dimension2 문항들을 분리하여 평균 계산
+ * - 각 축별 평균 점수를 비교하여 우세 극성 판단
  * 
  * 극성 판단:
- * - 평균 bipolar 값이 음수면 dimension1, 양수면 dimension2로 판단
- * - 미세한 차이도 인정하여 항상 한쪽 극성으로 판단 (균형 상태 없음)
+ * - dimension1 평균이 dimension2 평균보다 크면 dimension1, 작으면 dimension2로 판단
+ * - 동일한 경우 dimension2로 판단 (기본값)
  */
 
 import type { Answers } from './storage';
@@ -56,8 +55,6 @@ const AXIS_CONFIG = {
     dbKey: 'motivation' as const,
     pole1Key: 'intrinsic' as const,
     pole2Key: 'extrinsic' as const,
-    leftLabel: 'Intrinsic', // left_label이 dimension1에 해당
-    rightLabel: 'Extrinsic', // right_label이 dimension2에 해당
   },
   Flexibility: {
     dimension1: 'Change',
@@ -67,8 +64,6 @@ const AXIS_CONFIG = {
     dbKey: 'flexibility' as const,
     pole1Key: 'change' as const,
     pole2Key: 'system' as const,
-    leftLabel: 'Change',
-    rightLabel: 'System',
   },
   Direction: {
     dimension1: 'Results',
@@ -78,31 +73,17 @@ const AXIS_CONFIG = {
     dbKey: 'direction' as const,
     pole1Key: 'results' as const,
     pole2Key: 'people' as const,
-    leftLabel: 'Results',
-    rightLabel: 'People',
   },
   Communication: {
     dimension1: 'Direct',
-    dimension2: 'eNgage',
+    dimension2: 'Engage',
     code1: 'D',
     code2: 'N',
     dbKey: 'communication' as const,
     pole1Key: 'direct' as const,
     pole2Key: 'engage' as const,
-    leftLabel: 'Direct',
-    rightLabel: 'Engage',
   },
 } as const;
-
-/**
- * 선택 점수를 bipolar 값으로 변환
- * @param answer 선택한 점수 (1~7)
- * @returns bipolar 값 (-3 ~ +3)
- */
-function toBipolarValue(answer: number): number {
-  // 1점 → -3, 4점 → 0, 7점 → +3
-  return answer - 4;
-}
 
 /**
  * 점수 계산 함수 (클라이언트/서버 공통)
@@ -115,46 +96,48 @@ export function calculateScores(answers: Answers): Result {
   for (const [axis, config] of Object.entries(AXIS_CONFIG)) {
     const axisQuestions = questions.filter((q) => q.axis === axis);
     
-    let bipolarSum = 0; // bipolar 값의 합
-    let answeredCount = 0; // 답변한 문항 수
-
-    axisQuestions.forEach((question) => {
+    // dimension1과 dimension2 문항들을 분리
+    const dimension1Questions = axisQuestions.filter((q) => q.dimension === config.dimension1);
+    const dimension2Questions = axisQuestions.filter((q) => q.dimension === config.dimension2);
+    
+    // dimension1 평균 계산
+    let dimension1Sum = 0;
+    let dimension1Count = 0;
+    dimension1Questions.forEach((question) => {
       const answer = answers[question.id];
       if (answer !== undefined && answer >= 1 && answer <= 7) {
-        // 선택 점수를 bipolar 값으로 변환
-        const bipolarValue = toBipolarValue(answer);
-        
-        // left_label이 dimension1에 해당하는지 확인
-        // left_label이 dimension1이면: 음수 → dimension1, 양수 → dimension2
-        // left_label이 dimension2이면: 음수 → dimension2, 양수 → dimension1
-        // 현재 구조에서는 left_label이 항상 dimension1에 해당하므로
-        // bipolar 값이 음수면 dimension1, 양수면 dimension2에 가까움
-        bipolarSum += bipolarValue;
-        answeredCount++;
+        dimension1Sum += answer;
+        dimension1Count++;
       }
     });
+    const dimension1Avg = dimension1Count > 0 ? dimension1Sum / dimension1Count : 0;
+    
+    // dimension2 평균 계산
+    let dimension2Sum = 0;
+    let dimension2Count = 0;
+    dimension2Questions.forEach((question) => {
+      const answer = answers[question.id];
+      if (answer !== undefined && answer >= 1 && answer <= 7) {
+        dimension2Sum += answer;
+        dimension2Count++;
+      }
+    });
+    const dimension2Avg = dimension2Count > 0 ? dimension2Sum / dimension2Count : 0;
 
-    // 평균 bipolar 값 계산
-    const avgBipolar = answeredCount > 0 ? bipolarSum / answeredCount : 0;
+    // 점수를 1~7 범위로 제한하고 반올림
+    const score1 = Math.max(1, Math.min(7, Math.round(dimension1Avg * 10) / 10));
+    const score2 = Math.max(1, Math.min(7, Math.round(dimension2Avg * 10) / 10));
 
-    // 평균 bipolar 값을 기반으로 dimension1과 dimension2의 점수 계산
-    // avgBipolar가 -3 ~ 0이면 dimension1에 가까움, 0 ~ +3이면 dimension2에 가까움
-    // 점수 표시를 위해 1~7 범위로 변환
-    // dimension1 점수: avgBipolar가 -3이면 7, 0이면 4, +3이면 1
-    // dimension2 점수: avgBipolar가 -3이면 1, 0이면 4, +3이면 7
-    const score1 = Math.round((4 - avgBipolar) * 10) / 10; // dimension1 점수 (1~7 범위)
-    const score2 = Math.round((4 + avgBipolar) * 10) / 10; // dimension2 점수 (1~7 범위)
-
-    // 우세 극성 판단 (미세한 차이도 인정하여 항상 한쪽으로 판단)
+    // 우세 극성 판단
     let dominant: string;
     let code: string;
     
-    if (avgBipolar < 0) {
-      // 음수면 dimension1 (left_label)에 가까움
+    if (dimension1Avg > dimension2Avg) {
+      // dimension1 평균이 더 높으면 dimension1에 가까움
       dominant = config.dimension1;
       code = config.code1;
     } else {
-      // 0 이상이면 dimension2 (right_label)에 가까움 (0인 경우도 포함)
+      // dimension2 평균이 더 높거나 같으면 dimension2에 가까움
       dominant = config.dimension2;
       code = config.code2;
     }
@@ -163,8 +146,8 @@ export function calculateScores(answers: Answers): Result {
       axis,
       dimension1: config.dimension1,
       dimension2: config.dimension2,
-      score1: Math.max(1, Math.min(7, score1)), // 1~7 범위로 제한
-      score2: Math.max(1, Math.min(7, score2)), // 1~7 범위로 제한
+      score1,
+      score2,
       dominant,
     });
 

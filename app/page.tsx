@@ -134,7 +134,7 @@ export default function Home() {
             {/* 핵심 정보 배지 - 모바일 전용 */}
             <div className="mt-4 flex flex-nowrap justify-center gap-2 sm:hidden">
               <span className="rounded-full bg-gray-100 px-3 py-1 text-[12px] text-gray-700 whitespace-nowrap">4가지 기준</span>
-              <span className="rounded-full bg-gray-100 px-3 py-1 text-[12px] text-gray-700 whitespace-nowrap">32개 문항</span>
+              <span className="rounded-full bg-gray-100 px-3 py-1 text-[12px] text-gray-700 whitespace-nowrap">40개 문항</span>
               <span className="rounded-full bg-gray-100 px-3 py-1 text-[12px] text-gray-700 whitespace-nowrap">16가지 유형</span>
             </div>
             
@@ -183,13 +183,13 @@ export default function Home() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-[1.5] sm:leading-[1.6] font-normal">
-                    <span className="font-bold text-sm sm:text-base md:text-lg">32개 문항</span>을 통해 <span className="font-bold text-sm sm:text-base md:text-lg">16가지 리더십 유형</span>을 도출합니다.
+                    <span className="font-bold text-sm sm:text-base md:text-lg">40개 문항</span>을 통해 <span className="font-bold text-sm sm:text-base md:text-lg">16가지 리더십 유형</span>을 도출합니다.
                     <br className="hidden sm:block" />
                     <span className="sm:hidden"> </span>
-                    각 문항은 서로 반대되는 두 리더십 방식을 제시하며,
+                    각 문항에 대해 당신의 동의 정도를
                     <br className="hidden sm:block" />
                     <span className="sm:hidden"> </span>
-                    당신의 실제 행동에 더 가까운 쪽을 7점 척도로 선택합니다.
+                    7점 리커트 척도로 선택합니다.
                   </p>
                 </div>
               </div>

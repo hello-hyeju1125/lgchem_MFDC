@@ -7,13 +7,43 @@ import { storage, type Answers } from '@/lib/storage';
 import ProgressBar from '@/components/ProgressBar';
 import QuestionCard from '@/components/QuestionCard';
 
-// 파트 정의: 각 파트는 8개 문항
+// 파트 정의: 40개 문항을 10개씩 4개 파트로 분할
 const PARTS = [
-  { start: 0, end: 7, label: '1-8번' },    // 파트 1: 1-8번
-  { start: 8, end: 15, label: '9-16번' },   // 파트 2: 9-16번
-  { start: 16, end: 23, label: '17-24번' }, // 파트 3: 17-24번
-  { start: 24, end: 31, label: '25-32번' }, // 파트 4: 25-32번
+  { start: 0, end: 9, label: '1-10번' },      // 파트 1: 1-10번
+  { start: 10, end: 19, label: '11-20번' },   // 파트 2: 11-20번
+  { start: 20, end: 29, label: '21-30번' },   // 파트 3: 21-30번
+  { start: 30, end: 39, label: '31-40번' },   // 파트 4: 31-40번
 ];
+
+// 세션 코드를 기반으로 시드 생성 (같은 세션 코드면 같은 순서)
+function generateSeedFromSessionCode(sessionCode: string): number {
+  let hash = 0;
+  for (let i = 0; i < sessionCode.length; i++) {
+    const char = sessionCode.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+// 시드를 사용하여 배열을 섞기 (같은 시드면 같은 순서)
+function shuffleArrayWithSeed<T>(array: T[], seed: number): T[] {
+  const shuffled = [...array];
+  let random = seed;
+  
+  // 간단한 PRNG (Pseudo-Random Number Generator)
+  const nextRandom = () => {
+    random = (random * 9301 + 49297) % 233280;
+    return random / 233280;
+  };
+  
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(nextRandom() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
+  return shuffled;
+}
 
 function TestPageContent() {
   const router = useRouter();
@@ -28,6 +58,13 @@ function TestPageContent() {
   const [sessionValidating, setSessionValidating] = useState(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
   const [sessionTitle, setSessionTitle] = useState<string | null>(null);
+  
+  // 팝업 상태
+  const [showIncompleteModal, setShowIncompleteModal] = useState(false);
+  const [unansweredQuestions, setUnansweredQuestions] = useState<number[]>([]);
+  
+  // 섞인 문항 배열 상태
+  const [shuffledQuestions, setShuffledQuestions] = useState<typeof questions>([]);
 
   // 세션 코드 검증 함수
   const validateSessionCode = async (code: string): Promise<boolean> => {
@@ -86,6 +123,23 @@ function TestPageContent() {
       return;
     }
     
+    // 섞인 순서 복원 또는 생성
+    let shuffled: typeof questions;
+    const savedOrder = storage.loadShuffledOrder(sessionCode);
+    
+    if (savedOrder) {
+      // 저장된 순서가 있으면 그대로 사용
+      shuffled = savedOrder.map(id => questions.find(q => q.id === id)!).filter(Boolean);
+    } else {
+      // 저장된 순서가 없으면 새로 섞기
+      const seed = generateSeedFromSessionCode(sessionCode);
+      shuffled = shuffleArrayWithSeed(questions, seed);
+      // 섞인 순서 저장 (ID만 저장)
+      storage.saveShuffledOrder(sessionCode, shuffled.map(q => q.id));
+    }
+    
+    setShuffledQuestions(shuffled);
+    
     // localStorage에서 진행 상태 복원
     const savedAnswers = storage.loadAnswers();
     const savedIndex = storage.loadCurrentIndex();
@@ -106,9 +160,11 @@ function TestPageContent() {
     }
   }, [sessionCode]);
   
-  const totalQuestions = questions.length;
+  // 섞인 문항 배열이 준비되지 않았으면 빈 배열 사용
+  const questionsToUse = shuffledQuestions.length > 0 ? shuffledQuestions : questions;
+  const totalQuestions = questionsToUse.length;
   const currentPartInfo = PARTS[currentPart];
-  const partQuestions = questions.slice(currentPartInfo.start, currentPartInfo.end + 1);
+  const partQuestions = questionsToUse.slice(currentPartInfo.start, currentPartInfo.end + 1);
   
   // 현재 파트 내에서 답변한 문항 수 계산
   const answeredInPart = partQuestions.filter(q => 
@@ -126,7 +182,7 @@ function TestPageContent() {
 
   // 현재 활성화된 문항의 답변 여부 확인
   const isQuestionAnswered = (index: number) => {
-    const question = questions[index];
+    const question = questionsToUse[index];
     return question && answers[question.id] !== null && answers[question.id] !== undefined;
   };
 
@@ -149,40 +205,51 @@ function TestPageContent() {
     storage.saveAnswers(newAnswers);
 
     // 현재 답변한 문항의 인덱스 찾기
-    const currentQuestionIndex = questions.findIndex(q => q.id === questionId);
+    const currentQuestionIndex = questionsToUse.findIndex(q => q.id === questionId);
     const nextIndex = currentQuestionIndex + 1;
     
-    // 다음 문항이 있는지 확인
-    if (nextIndex < totalQuestions) {
-      // 다음 문항으로 이동
+    // 다음 문항이 같은 파트 내에 있는지 확인
+    const isNextInSamePart = nextIndex <= currentPartInfo.end;
+    
+    // 같은 파트 내에서만 자동 스크롤 (다음 파트로 자동 이동하지 않음)
+    if (isNextInSamePart && nextIndex < totalQuestions) {
       setTimeout(() => {
         setActiveIndex(nextIndex);
         storage.saveCurrentIndex(nextIndex);
         
-        // 다음 문항이 다른 파트에 있으면 파트 변경
-        const nextPart = PARTS.findIndex(part => 
-          nextIndex >= part.start && nextIndex <= part.end
-        );
-        if (nextPart !== -1 && nextPart !== currentPart) {
-          setCurrentPart(nextPart);
+        // 다음 문항 카드로 스크롤
+        const nextQuestionRef = questionRefs.current[nextIndex];
+        if (nextQuestionRef) {
+          nextQuestionRef.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
         }
-        
-        // 스크롤을 맨 위로
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 300);
-    } else {
-      // 모든 문항 완료 - 결과 페이지로 이동
-      setTimeout(() => {
-        router.push('/result');
       }, 300);
     }
+    // 마지막 문항이거나 다음 파트로 넘어가는 경우는 자동 이동하지 않음
   };
 
   const handleNextPart = () => {
+    // 현재 파트에서 답변하지 않은 문항 확인
+    const unansweredInCurrentPart: number[] = [];
+    for (let i = currentPartInfo.start; i <= currentPartInfo.end; i++) {
+      if (!isQuestionAnswered(i)) {
+        unansweredInCurrentPart.push(i + 1); // 사용자에게 보여줄 때는 1부터 시작
+      }
+    }
+    
+    // 답변하지 않은 문항이 있으면 팝업 표시
+    if (unansweredInCurrentPart.length > 0) {
+      setUnansweredQuestions(unansweredInCurrentPart);
+      setShowIncompleteModal(true);
+      return;
+    }
+    
+    // 모든 문항이 답변되었으면 다음 파트로 이동
     if (currentPart < PARTS.length - 1) {
       const nextPart = currentPart + 1;
       const nextPartInfo = PARTS[nextPart];
-      const nextUnanswered = getNextUnansweredInPart();
       
       // 다음 파트의 첫 번째 답변하지 않은 문항으로 이동
       let nextIndex = nextPartInfo.start;
@@ -233,7 +300,7 @@ function TestPageContent() {
   };
 
   // 현재 활성 문항만 표시
-  const currentQuestion = questions[activeIndex];
+  const currentQuestion = questionsToUse[activeIndex];
   const isLastQuestion = activeIndex === totalQuestions - 1;
   const isFirstQuestion = activeIndex === 0;
 
@@ -278,8 +345,8 @@ function TestPageContent() {
     }
   };
 
-  // 세션 코드 검증 중인 경우 로딩 화면 표시
-  if (sessionValidating) {
+  // 세션 코드 검증 중이거나 (세션 코드가 있고 섞인 문항 배열이 준비되지 않은 경우) 로딩 화면 표시
+  if (sessionValidating || (sessionCode && shuffledQuestions.length === 0)) {
     return (
       <main className="py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-y-auto flex items-center justify-center">
         {/* 배경 그라데이션 */}
@@ -331,49 +398,64 @@ function TestPageContent() {
         {/* 안내 문구 */}
         <div className="mb-3 sm:mb-4 md:mb-5 animate-fade-in">
           <ProgressBar current={progress} total={totalQuestions} />
-          <div className="mt-2 sm:mt-2 text-center">
+          <div className="mt-4 sm:mt-5 text-center">
             <div className="mt-1.5 sm:mt-2 text-center">
-              <p className="text-[15.6px] sm:text-[18.2px] md:text-[20.8px] text-gray-600 font-medium px-4 break-keep">
-                아래 두 문장 중, 당신의 실제 리더십 행동에 더 가까운 쪽을 선택해주세요.
+              <p className="text-[25px] sm:text-[29px] md:text-[33px] text-gray-600 font-bold px-2 break-keep leading-[1.2]">
+                현재 당신의 리더십 방식과 얼마나 일치하는지 선택해 주세요.
               </p>
+              {/* 범례 */}
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 text-sm sm:text-base md:text-lg text-gray-600 flex-wrap mt-3 sm:mt-4">
+                <span>1: 전혀 일치하지 않는다</span>
+                <span className="text-gray-400">|</span>
+                <span>4: 보통이다</span>
+                <span className="text-gray-400">|</span>
+                <span>7: 매우 일치한다</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 문항 카드 영역 */}
-        <div className="w-full max-w-4xl mx-auto py-3 sm:py-4">
-          {currentQuestion && (
-            <QuestionCard
-              leftLabel={currentQuestion.left_label}
-              rightLabel={currentQuestion.right_label}
-              leftStatement={currentQuestion.left_statement}
-              rightStatement={currentQuestion.right_statement}
-              value={answers[currentQuestion.id] || null}
-              onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
-              disabled={false}
-            />
-          )}
+        {/* 문항 카드 영역 - 현재 파트의 모든 문항 표시 */}
+        <div className="w-full max-w-4xl mx-auto py-3 sm:py-4 space-y-4 sm:space-y-6">
+          {partQuestions.map((question, index) => {
+            const questionIndex = currentPartInfo.start + index;
+            return (
+              <div
+                key={question.id}
+                ref={(el) => {
+                  questionRefs.current[questionIndex] = el;
+                }}
+              >
+                <QuestionCard
+                  statement={question.statement}
+                  value={answers[question.id] || null}
+                  onChange={(value) => handleAnswerChange(question.id, value)}
+                  disabled={false}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex flex-row justify-between items-center mt-8 sm:mt-10 md:mt-12 gap-3 sm:gap-6 animate-fade-in">
           <button
-            onClick={isFirstQuestion ? () => router.push('/') : handlePreviousQuestion}
+            onClick={currentPart === 0 ? () => router.push('/') : handlePreviousPart}
             className="glass-premium text-gray-700 px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl transition-all duration-300 active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
             style={{ fontSize: '16px' }}
           >
             <span className="flex items-center justify-center whitespace-nowrap">
-              {isFirstQuestion ? '← 메인으로' : '← 이전 문항'}
+              {currentPart === 0 ? '← 메인으로' : '← 이전 파트'}
             </span>
           </button>
           
-          {!isLastQuestion && (
+          {currentPart < PARTS.length - 1 && (
             <button
-              onClick={handleNextQuestion}
+              onClick={handleNextPart}
               className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
               style={{ fontSize: '16px' }}
             >
               <span className="flex items-center justify-center gap-1 sm:gap-3 whitespace-nowrap">
-                다음 문항
+                다음 파트
                 <svg className="w-4 h-4 sm:w-6 sm:h-6 transform sm:group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -381,9 +463,18 @@ function TestPageContent() {
             </button>
           )}
           
-          {isLastQuestion && (
+          {currentPart === PARTS.length - 1 && (
             <button
-              onClick={() => router.push('/result')}
+              onClick={() => {
+                // 모든 문항이 답변되었는지 확인
+                const allAnswered = totalQuestions === answeredCount;
+                if (allAnswered) {
+                  router.push('/result');
+                } else {
+                  // 답변하지 않은 문항이 있으면 알림
+                  alert('모든 문항에 답변해주세요.');
+                }
+              }}
               className="px-4 sm:px-10 md:px-12 h-[44px] sm:h-[52px] rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg md:text-xl text-white transition-all duration-300 bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl flex-1 sm:flex-none sm:w-auto flex items-center justify-center"
               style={{ fontSize: '16px' }}
             >
@@ -397,6 +488,55 @@ function TestPageContent() {
           )}
         </div>
       </div>
+
+      {/* 미완료 문항 안내 팝업 */}
+      {showIncompleteModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowIncompleteModal(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full animate-scale-in shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 text-center">
+              진단 미완료
+            </h3>
+            <p className="text-sm sm:text-base text-gray-700 mb-4 text-center">
+              현재 파트에서 아직 답변하지 않은 문항이 있습니다.
+            </p>
+            <div className="mb-6">
+              <p className="text-sm sm:text-base text-gray-600 mb-2 font-medium">
+                미완료 문항:
+              </p>
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                <p className="text-sm sm:text-base text-gray-700">
+                  {unansweredQuestions.join(', ')}번 문항
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setShowIncompleteModal(false);
+                // 첫 번째 미완료 문항으로 스크롤
+                if (unansweredQuestions.length > 0) {
+                  const firstUnansweredIndex = unansweredQuestions[0] - 1; // 0-based index
+                  const questionRef = questionRefs.current[firstUnansweredIndex];
+                  if (questionRef) {
+                    questionRef.scrollIntoView({ 
+                      behavior: 'smooth', 
+                      block: 'center' 
+                    });
+                  }
+                }
+              }}
+              className="w-full px-6 py-3 rounded-xl font-bold text-base sm:text-lg text-white bg-gradient-to-r from-brand-purple to-brand-magenta shadow-lg transition-all duration-300 hover:shadow-xl active:scale-95"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -4,7 +4,7 @@
  * POST /api/submit
  * 
  * 익명 사용자가 진단 결과를 제출합니다.
- * - session_code와 32문항의 응답(answers)을 받습니다
+ * - session_code와 40문항의 응답(answers)을 받습니다
  * - 점수를 계산하고 responses 테이블에 저장합니다
  * - 개인 결과 요약을 반환합니다 (개인 화면용)
  * 
@@ -31,11 +31,10 @@ const SubmitSchema = z.object({
           ([_, value]) => value !== null && value !== undefined && typeof value === 'number'
         );
         const count = validAnswers.length;
-        // 4번 닷이 제거되어 1,2,3,5,6,7만 선택 가능하므로 최소 30개 이상이어야 함
-        // 모든 문항(32개)에 답변했을 때를 기준으로 검증
-        return count >= 30 && count <= 32;
+        // 현재 문항 수(40개)에 모두 답변했는지 검증
+        return count === 40;
       },
-      '30개 이상 32개 이하의 문항에 대한 응답이 필요합니다'
+      '40개 문항에 모두 응답해야 합니다'
     ),
   clientHash: z.string().optional(), // 중복 제출 방지용 (선택사항)
   participantName: z
@@ -162,8 +161,8 @@ export async function POST(request: NextRequest) {
           axis: score.axis,
           dimension1: score.dimension1,
           dimension2: score.dimension2,
-          score1: Math.round((score.score1 / 8) * 100) / 100, // 평균으로 변환
-          score2: Math.round((score.score2 / 8) * 100) / 100,
+          score1: score.score1, // 이미 평균값 (1~7 범위)
+          score2: score.score2, // 이미 평균값 (1~7 범위)
           dominant: score.dominant,
         })),
         submittedAt: new Date().toISOString(),

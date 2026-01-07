@@ -7,8 +7,9 @@
  * POST /api/admin/sessions?admin_key=...
  * body: { title, starts_at }
  * - 새 세션 생성
- * - session_code는 LGCH-YYYYMMDD-AM/PM 형태로 자동 생성
- * - 충돌 시 난수 suffix 추가
+ * - session_code는 세션명(title)을 기반으로 생성
+ * - 세션명의 공백은 하이픈(-)으로, 특수문자는 제거하여 URL-safe하게 변환
+ * - 충돌 시 숫자 suffix 추가 (예: 세션명-1, 세션명-2)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,87 +26,43 @@ const CreateSessionSchema = z.object({
 });
 
 /**
- * session_code 자동 생성
- * 형식: LGCH-YYYYMMDD-AM 또는 LGCH-YYYYMMDD-PM
- * 충돌 시: LGCH-YYYYMMDD-AM-RANDOM 형태로 난수 suffix 추가
+ * 세션명을 URL-safe한 세션 코드로 변환
+ * - 공백을 하이픈(-)으로 변환
+ * - 특수문자는 제거하거나 하이픈으로 변환
+ * - 연속된 하이픈은 하나로 통합
+ * - 앞뒤 공백 및 하이픈 제거
  */
-function generateSessionCode(startsAt?: string): string {
-  let date: Date;
-  
-  if (startsAt) {
-    // starts_at이 제공된 경우 (ISO 8601 형식)
-    // ISO 문자열을 파싱하고 한국 시간대로 변환
-    date = new Date(startsAt);
-    
-    // ISO 문자열의 경우 UTC 기준이므로, 한국 시간(UTC+9)으로 변환
-    // 한국 시간대의 날짜/시간 가져오기
-    const koreaTimeString = date.toLocaleString('en-US', { 
-      timeZone: KOREA_TIMEZONE,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-    
-    // "MM/DD/YYYY, HH:mm" 형식을 파싱
-    const [datePart, timePart] = koreaTimeString.split(', ');
-    const [month, day, year] = datePart.split('/');
-    const [hours, minutes] = timePart.split(':');
-    
-    date = new Date(
-      parseInt(year),
-      parseInt(month) - 1,
-      parseInt(day),
-      parseInt(hours),
-      parseInt(minutes)
-    );
-  } else {
-    // 현재 시간 기준 (한국 시간)
-    const now = new Date();
-    const koreaTimeString = now.toLocaleString('en-US', { 
-      timeZone: KOREA_TIMEZONE,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-    
-    const [datePart, timePart] = koreaTimeString.split(', ');
-    const [month, day, year] = datePart.split('/');
-    const [hours, minutes] = timePart.split(':');
-    
-    date = new Date(
-      parseInt(year),
-      parseInt(month) - 1,
-      parseInt(day),
-      parseInt(hours),
-      parseInt(minutes)
-    );
-  }
-  
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = date.getHours();
-  
-  // 오전(AM): 0-11시, 오후(PM): 12-23시
-  const period = hours < 12 ? 'AM' : 'PM';
-  
-  const baseCode = `LGCH-${year}${month}${day}-${period}`;
-  return baseCode;
+function sanitizeSessionCode(title: string): string {
+  return title
+    .trim()
+    // 공백을 하이픈으로 변환
+    .replace(/\s+/g, '-')
+    // 특수문자를 하이픈으로 변환 (한글, 영문, 숫자, 하이픈, 언더스코어 제외)
+    .replace(/[^가-힣a-zA-Z0-9\-_]/g, '-')
+    // 연속된 하이픈을 하나로 통합
+    .replace(/-+/g, '-')
+    // 앞뒤 하이픈 제거
+    .replace(/^-+|-+$/g, '')
+    // 대문자로 변환 (선택사항, 필요시 주석 해제)
+    // .toUpperCase();
 }
 
 /**
  * 세션 코드 충돌 체크 및 고유 코드 생성
+ * 세션명을 기반으로 세션 코드를 생성하고, 충돌 시 suffix 추가
  */
-async function generateUniqueSessionCode(startsAt?: string): Promise<string> {
-  let code = generateSessionCode(startsAt);
+async function generateUniqueSessionCode(title: string): Promise<string> {
+  // 세션명을 세션 코드로 변환
+  let code = sanitizeSessionCode(title);
+  
+  // 빈 문자열이면 기본값 사용
+  if (!code) {
+    code = 'SESSION';
+  }
+  
   let attempts = 0;
   const maxAttempts = 10;
+  const baseCode = code;
   
   while (attempts < maxAttempts) {
     // 기존 세션 코드 확인
@@ -120,15 +77,14 @@ async function generateUniqueSessionCode(startsAt?: string): Promise<string> {
       return code;
     }
     
-    // 충돌 발생 시 난수 suffix 추가
-    const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    code = `${code}-${randomSuffix}`;
+    // 충돌 발생 시 숫자 suffix 추가
     attempts++;
+    code = `${baseCode}-${attempts}`;
   }
   
   // 최후의 수단: 타임스탬프 기반
   const timestamp = Date.now().toString().slice(-6);
-  return `${generateSessionCode(startsAt)}-${timestamp}`;
+  return `${baseCode}-${timestamp}`;
 }
 
 /**
@@ -246,8 +202,8 @@ export async function POST(request: NextRequest) {
     
     const { title, starts_at } = validationResult.data;
     
-    // 고유 세션 코드 생성
-    const sessionCode = await generateUniqueSessionCode(starts_at);
+    // 고유 세션 코드 생성 (세션명 기반)
+    const sessionCode = await generateUniqueSessionCode(title);
     
     // starts_at을 한국 시간대 기준으로 처리
     let startsAtValue: string | null = null;
