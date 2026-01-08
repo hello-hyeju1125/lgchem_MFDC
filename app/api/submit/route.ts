@@ -63,9 +63,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 디버깅: 제출된 데이터 로그
+    const validAnswersCount = body.answers ? Object.entries(body.answers).filter(
+      ([_, value]) => value !== null && value !== undefined && typeof value === 'number'
+    ).length : 0;
+    
     console.log('제출된 데이터:', {
       sessionCode: body.sessionCode,
       answersCount: body.answers ? Object.keys(body.answers).length : 0,
+      validAnswersCount,
       answersKeys: body.answers ? Object.keys(body.answers) : [],
       answersValues: body.answers ? Object.values(body.answers) : [],
       participantName: body.participantName,

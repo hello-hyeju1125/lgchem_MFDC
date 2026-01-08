@@ -73,7 +73,7 @@ const AXIS_CONFIG = {
   Direction: {
     dimension1: 'Work',
     dimension2: 'People',
-    code1: 'R',
+    code1: 'W',
     code2: 'P',
     dbKey: 'direction' as const,
     pole1Key: 'work' as const,

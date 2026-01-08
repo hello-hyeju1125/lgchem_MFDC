@@ -112,7 +112,15 @@ export default function ResultCodePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const codeUpper = code?.toUpperCase() || '';
+    let codeUpper = code?.toUpperCase() || '';
+    
+    // URL의 코드에서 Direction 축(3번째 문자)의 R을 W로 변환 (하위 호환성)
+    if (codeUpper && codeUpper.length === 4 && codeUpper[2] === 'R') {
+      codeUpper = codeUpper.substring(0, 2) + 'W' + codeUpper.substring(3);
+      // 변환된 코드로 URL 업데이트 (리다이렉트)
+      router.push(`/result/${codeUpper.toLowerCase()}`);
+      return;
+    }
     
     // localStorage에서 답변 로드 시도
     const answers = storage.loadAnswers();
@@ -149,7 +157,7 @@ export default function ResultCodePage() {
       const axisConfig = {
         Motivation: { dimension1: 'Intrinsic', dimension2: 'Extrinsic', code1: 'I', code2: 'E' },
         Flexibility: { dimension1: 'Change', dimension2: 'System', code1: 'C', code2: 'S' },
-        Direction: { dimension1: 'Work', dimension2: 'People', code1: 'R', code2: 'P' },
+        Direction: { dimension1: 'Work', dimension2: 'People', code1: 'W', code2: 'P' },
         Communication: { dimension1: 'Direct', dimension2: 'eNgage', code1: 'D', code2: 'N' },
       };
       
@@ -214,7 +222,11 @@ export default function ResultCodePage() {
     );
   }
 
-  const leadershipTypeCode = result.code.toUpperCase();
+  // 코드에서 Direction 축(3번째 문자)의 R을 W로 변환 (안전장치)
+  let leadershipTypeCode = result.code.toUpperCase();
+  if (leadershipTypeCode.length === 4 && leadershipTypeCode[2] === 'R') {
+    leadershipTypeCode = leadershipTypeCode.substring(0, 2) + 'W' + leadershipTypeCode.substring(3);
+  }
   const leadershipType = (leadershipTypes as Record<string, LeadershipType>)[leadershipTypeCode] || null;
   
   // 디버깅용 (개발 환경에서만)

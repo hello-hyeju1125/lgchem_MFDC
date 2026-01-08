@@ -22,12 +22,27 @@ export default function ResultPage() {
       hasSubmittedRef.current = true;
 
       try {
-        // 1. 답변 로드
-        const answers = storage.loadAnswers();
+        // 1. 답변 로드 및 정리
+        const rawAnswers = storage.loadAnswers();
+        
+        // null, undefined, 유효하지 않은 값 제거
+        const answers: Record<string, number> = {};
+        Object.entries(rawAnswers).forEach(([key, value]) => {
+          if (value !== null && value !== undefined && typeof value === 'number' && value >= 1 && value <= 7) {
+            answers[key] = value;
+          }
+        });
         
         if (Object.keys(answers).length === 0) {
           // 답변이 없으면 메인으로 리다이렉트
           router.push('/');
+          return;
+        }
+        
+        // 답변 개수 확인 (32개여야 함)
+        if (Object.keys(answers).length !== 32) {
+          setStatus('error');
+          setErrorMessage(`답변이 완료되지 않았습니다. (현재 ${Object.keys(answers).length}/32개 답변)`);
           return;
         }
 
