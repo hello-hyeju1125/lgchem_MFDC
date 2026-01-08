@@ -261,7 +261,7 @@ export default function ResultCodePage() {
                 <div className="flex-shrink-0 flex flex-col items-center w-72 sm:w-72 md:w-80 mx-auto sm:mx-0 gap-2 sm:gap-0">
                   {/* 모바일에서 코드 박스를 이미지 컨테이너 상단에 배치 */}
                   <div className="sm:hidden flex justify-center -mt-2 mb-3">
-                    <div className="inline-flex items-center justify-center w-[88px] h-[56px] rounded-2xl shadow-lg relative overflow-hidden">
+                    <div className="inline-flex items-center justify-center w-[101px] h-[56px] rounded-2xl shadow-lg relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-r from-brand-purple via-brand-magenta via-brand-deep-blue to-brand-magenta opacity-95 animate-gradient" />
                       <span className="relative z-10 text-[30px] font-extrabold leading-none text-white tracking-[0.02em]">
                         {leadershipTypeCode}
