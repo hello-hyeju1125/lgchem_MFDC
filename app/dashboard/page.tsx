@@ -54,8 +54,8 @@ const AXIS_LABELS: Record<string, { name: string; poles: Record<string, string> 
   direction: {
     name: '방향성',
     poles: {
-      results: '성과',
-      people: '관계',
+      work: '일',
+      people: '사람',
       balanced: '균형',
     },
   },

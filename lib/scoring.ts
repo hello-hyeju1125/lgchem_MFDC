@@ -1,17 +1,22 @@
 /**
  * 리더십 진단 점수 계산 로직
  * 
- * 64문항의 응답(1~7점)을 입력받아 4개 축의 점수를 계산하고,
- * 각 축의 우세 극성을 판단하여 16가지 리더십 유형을 결정합니다.
+ * 새로운 Set 기반 계산 방식:
+ * - 문항은 2개가 1 Set으로 구성 (총 32개 문항 = 16 Set)
+ * - Set 내 두 문항은 서로 대립되는 성향
+ * - Set 단위로 평균 계산 → 동일 성향 문항들을 묶어 평균 → 축 기준 정규화
  * 
- * 새로운 7점 리커트 척도 방식:
- * - 각 문항은 독립적으로 1~7점으로 평가
- * - 각 축별로 dimension1과 dimension2 문항들을 분리하여 평균 계산
- * - 각 축별 평균 점수를 비교하여 우세 극성 판단
+ * 점수 계산 규칙:
+ * 1. Set 단위로 평균 계산
+ * 2. 동일 성향 문항들을 묶어 평균 점수 계산
+ * 3. 각 축(pair)에서 두 성향의 평균 점수 합은 반드시 100이 되어야 함
+ *    - 변화 평균지수 + 관리 평균지수 = 100
+ *    - 사람 평균지수 + 일 평균지수 = 100
+ *    - 내재적 평균지수 + 외재적 평균지수 = 100
+ *    - 지시 평균지수 + 참여 평균지수 = 100
  * 
- * 극성 판단:
- * - dimension1 평균이 dimension2 평균보다 크면 dimension1, 작으면 dimension2로 판단
- * - 동일한 경우 dimension2로 판단 (기본값)
+ * 최종 점수:
+ * - 내재적/외재적, 사람/일, 변화/관리, 지시/참여 (각 축별로 합이 100)
  */
 
 import type { Answers } from './storage';
@@ -21,8 +26,8 @@ export interface AxisScore {
   axis: string;
   dimension1: string;
   dimension2: string;
-  score1: number;
-  score2: number;
+  score1: number; // dimension1의 정규화된 점수 (0-100)
+  score2: number; // dimension2의 정규화된 점수 (0-100)
   dominant: string; // 'dimension1' 또는 'dimension2'
 }
 
@@ -35,14 +40,14 @@ export interface Result {
 export interface DatabaseAxisScores {
   motivation: { intrinsic: number; extrinsic: number };
   flexibility: { change: number; system: number };
-  direction: { results: number; people: number };
+  direction: { work: number; people: number };
   communication: { direct: number; engage: number };
 }
 
 export interface DatabasePole {
   motivation: 'intrinsic' | 'extrinsic' | 'balanced';
   flexibility: 'change' | 'system' | 'balanced';
-  direction: 'results' | 'people' | 'balanced';
+  direction: 'work' | 'people' | 'balanced';
   communication: 'direct' | 'engage' | 'balanced';
 }
 
@@ -66,12 +71,12 @@ const AXIS_CONFIG = {
     pole2Key: 'system' as const,
   },
   Direction: {
-    dimension1: 'Results',
+    dimension1: 'Work',
     dimension2: 'People',
     code1: 'R',
     code2: 'P',
     dbKey: 'direction' as const,
-    pole1Key: 'results' as const,
+    pole1Key: 'work' as const,
     pole2Key: 'people' as const,
   },
   Communication: {
@@ -87,6 +92,11 @@ const AXIS_CONFIG = {
 
 /**
  * 점수 계산 함수 (클라이언트/서버 공통)
+ * 
+ * 계산 과정:
+ * 1. 각 Set에서 두 문항의 점수를 평균 계산
+ * 2. 동일 성향의 Set 평균들을 모아서 전체 평균 계산
+ * 3. 각 축에서 두 성향의 평균 합이 100이 되도록 정규화
  */
 export function calculateScores(answers: Answers): Result {
   const axisScores: AxisScore[] = [];
@@ -94,50 +104,88 @@ export function calculateScores(answers: Answers): Result {
 
   // 각 축별로 점수 계산
   for (const [axis, config] of Object.entries(AXIS_CONFIG)) {
-    const axisQuestions = questions.filter((q) => q.axis === axis);
+    // 해당 축의 모든 Set 찾기
+    const axisSets = questions.filter((set) => set.axis === axis);
     
-    // dimension1과 dimension2 문항들을 분리
-    const dimension1Questions = axisQuestions.filter((q) => q.dimension === config.dimension1);
-    const dimension2Questions = axisQuestions.filter((q) => q.dimension === config.dimension2);
+    // dimension1과 dimension2의 Set 평균들을 저장할 배열
+    const dimension1SetAverages: number[] = [];
+    const dimension2SetAverages: number[] = [];
     
-    // dimension1 평균 계산
-    let dimension1Sum = 0;
-    let dimension1Count = 0;
-    dimension1Questions.forEach((question) => {
-      const answer = answers[question.id];
-      if (answer !== undefined && answer >= 1 && answer <= 7) {
-        dimension1Sum += answer;
-        dimension1Count++;
+    // 각 Set에 대해 처리
+    for (const set of axisSets) {
+      let dimension1Sum = 0;
+      let dimension1Count = 0;
+      let dimension2Sum = 0;
+      let dimension2Count = 0;
+      
+      // Set 내 두 문항 처리
+      for (const question of set.questions) {
+        const answer = answers[question.id];
+        if (answer !== undefined && answer >= 1 && answer <= 7) {
+          if (question.dimension === config.dimension1) {
+            dimension1Sum += answer;
+            dimension1Count++;
+          } else if (question.dimension === config.dimension2) {
+            dimension2Sum += answer;
+            dimension2Count++;
+          }
+        }
       }
-    });
-    const dimension1Avg = dimension1Count > 0 ? dimension1Sum / dimension1Count : 0;
-    
-    // dimension2 평균 계산
-    let dimension2Sum = 0;
-    let dimension2Count = 0;
-    dimension2Questions.forEach((question) => {
-      const answer = answers[question.id];
-      if (answer !== undefined && answer >= 1 && answer <= 7) {
-        dimension2Sum += answer;
-        dimension2Count++;
+      
+      // Set 단위 평균 계산 (각 Set에서 dimension1과 dimension2의 평균)
+      if (dimension1Count > 0) {
+        dimension1SetAverages.push(dimension1Sum / dimension1Count);
       }
-    });
-    const dimension2Avg = dimension2Count > 0 ? dimension2Sum / dimension2Count : 0;
-
-    // 점수를 1~7 범위로 제한하고 반올림
-    const score1 = Math.max(1, Math.min(7, Math.round(dimension1Avg * 10) / 10));
-    const score2 = Math.max(1, Math.min(7, Math.round(dimension2Avg * 10) / 10));
+      if (dimension2Count > 0) {
+        dimension2SetAverages.push(dimension2Sum / dimension2Count);
+      }
+    }
+    
+    // 동일 성향 문항들을 묶어 평균 점수 계산
+    const dimension1Avg = dimension1SetAverages.length > 0
+      ? dimension1SetAverages.reduce((sum, avg) => sum + avg, 0) / dimension1SetAverages.length
+      : 0;
+    
+    const dimension2Avg = dimension2SetAverages.length > 0
+      ? dimension2SetAverages.reduce((sum, avg) => sum + avg, 0) / dimension2SetAverages.length
+      : 0;
+    
+    // 축별 평균값을 100 기준으로 정규화 (두 성향의 합 = 100)
+    let score1: number;
+    let score2: number;
+    
+    const total = dimension1Avg + dimension2Avg;
+    if (total > 0) {
+      // 비율로 정규화하여 합이 100이 되도록
+      score1 = (dimension1Avg / total) * 100;
+      score2 = (dimension2Avg / total) * 100;
+    } else {
+      // 둘 다 0인 경우 기본값 50:50
+      score1 = 50;
+      score2 = 50;
+    }
+    
+    // 소수점 둘째 자리까지 반올림
+    score1 = Math.round(score1 * 100) / 100;
+    score2 = Math.round(score2 * 100) / 100;
+    
+    // 합이 정확히 100이 되도록 조정 (반올림 오차 보정)
+    const sum = score1 + score2;
+    if (Math.abs(sum - 100) > 0.01) {
+      const diff = 100 - sum;
+      score1 += diff;
+      score1 = Math.round(score1 * 100) / 100;
+      score2 = 100 - score1;
+    }
 
     // 우세 극성 판단
     let dominant: string;
     let code: string;
     
-    if (dimension1Avg > dimension2Avg) {
-      // dimension1 평균이 더 높으면 dimension1에 가까움
+    if (score1 > score2) {
       dominant = config.dimension1;
       code = config.code1;
     } else {
-      // dimension2 평균이 더 높거나 같으면 dimension2에 가까움
       dominant = config.dimension2;
       code = config.code2;
     }
@@ -173,14 +221,14 @@ export function convertToDatabaseFormat(result: Result): {
   const axisScores: DatabaseAxisScores = {
     motivation: { intrinsic: 0, extrinsic: 0 },
     flexibility: { change: 0, system: 0 },
-    direction: { results: 0, people: 0 },
+    direction: { work: 0, people: 0 },
     communication: { direct: 0, engage: 0 },
   };
 
   const pole: DatabasePole = {
-    motivation: 'intrinsic', // 기본값 (실제로는 각 축의 dominant에 따라 덮어씌워짐)
+    motivation: 'intrinsic',
     flexibility: 'change',
-    direction: 'results',
+    direction: 'work',
     communication: 'direct',
   };
 
@@ -192,7 +240,7 @@ export function convertToDatabaseFormat(result: Result): {
 
     if (!config) return;
 
-    // 점수를 그대로 사용 (이미 1~7 범위로 정규화됨)
+    // 정규화된 점수 사용 (이미 0-100 범위)
     const score1 = axisScore.score1;
     const score2 = axisScore.score2;
 
@@ -202,20 +250,20 @@ export function convertToDatabaseFormat(result: Result): {
     const pole2Key = config.pole2Key;
 
     if (dbKey === 'motivation') {
-      axisScores.motivation[pole1Key as 'intrinsic' | 'extrinsic'] = Math.round(score1 * 100) / 100;
-      axisScores.motivation[pole2Key as 'intrinsic' | 'extrinsic'] = Math.round(score2 * 100) / 100;
+      axisScores.motivation[pole1Key as 'intrinsic' | 'extrinsic'] = score1;
+      axisScores.motivation[pole2Key as 'intrinsic' | 'extrinsic'] = score2;
     } else if (dbKey === 'flexibility') {
-      axisScores.flexibility[pole1Key as 'change' | 'system'] = Math.round(score1 * 100) / 100;
-      axisScores.flexibility[pole2Key as 'change' | 'system'] = Math.round(score2 * 100) / 100;
+      axisScores.flexibility[pole1Key as 'change' | 'system'] = score1;
+      axisScores.flexibility[pole2Key as 'change' | 'system'] = score2;
     } else if (dbKey === 'direction') {
-      axisScores.direction[pole1Key as 'results' | 'people'] = Math.round(score1 * 100) / 100;
-      axisScores.direction[pole2Key as 'results' | 'people'] = Math.round(score2 * 100) / 100;
+      axisScores.direction[pole1Key as 'work' | 'people'] = score1;
+      axisScores.direction[pole2Key as 'work' | 'people'] = score2;
     } else if (dbKey === 'communication') {
-      axisScores.communication[pole1Key as 'direct' | 'engage'] = Math.round(score1 * 100) / 100;
-      axisScores.communication[pole2Key as 'direct' | 'engage'] = Math.round(score2 * 100) / 100;
+      axisScores.communication[pole1Key as 'direct' | 'engage'] = score1;
+      axisScores.communication[pole2Key as 'direct' | 'engage'] = score2;
     }
 
-    // 우세 극성 변환 (대문자 → 소문자)
+    // 우세 극성 변환
     if (axisScore.dominant === config.dimension1) {
       pole[dbKey] = pole1Key as any;
     } else if (axisScore.dominant === config.dimension2) {

@@ -67,7 +67,7 @@ lgchem_MFDC/
 
 1. **동기부여 (Motivation)**: Intrinsic (I) vs Extrinsic (E)
 2. **유연성 (Flexibility)**: Change (C) vs System (S)
-3. **리더십 방향성 (Direction)**: Results (R) vs People (P)
+3. **리더십 방향성 (Direction)**: Work (R) vs People (P)
 4. **소통 방식 (Communication)**: Direct (D) vs eNgage (N)
 
 ### 결과 코드 형식

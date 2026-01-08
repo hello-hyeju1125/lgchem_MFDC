@@ -5,14 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import questions from '@/data/questions.json';
 import { storage, type Answers } from '@/lib/storage';
 import ProgressBar from '@/components/ProgressBar';
-import QuestionCard from '@/components/QuestionCard';
+import QuestionSetCard from '@/components/QuestionSetCard';
 
-// 파트 정의: 40개 문항을 10개씩 4개 파트로 분할
+// 파트 정의: 16개 Set를 4개씩 4개 파트로 분할
 const PARTS = [
-  { start: 0, end: 9, label: '1-10번' },      // 파트 1: 1-10번
-  { start: 10, end: 19, label: '11-20번' },   // 파트 2: 11-20번
-  { start: 20, end: 29, label: '21-30번' },   // 파트 3: 21-30번
-  { start: 30, end: 39, label: '31-40번' },   // 파트 4: 31-40번
+  { start: 0, end: 3, label: '1-4번' },      // 파트 1: 1-4번
+  { start: 4, end: 7, label: '5-8번' },      // 파트 2: 5-8번
+  { start: 8, end: 11, label: '9-12번' },    // 파트 3: 9-12번
+  { start: 12, end: 15, label: '13-16번' },  // 파트 4: 13-16번
 ];
 
 // 세션 코드를 기반으로 시드 생성 (같은 세션 코드면 같은 순서)
@@ -63,8 +63,8 @@ function TestPageContent() {
   const [showIncompleteModal, setShowIncompleteModal] = useState(false);
   const [unansweredQuestions, setUnansweredQuestions] = useState<number[]>([]);
   
-  // 섞인 문항 배열 상태
-  const [shuffledQuestions, setShuffledQuestions] = useState<typeof questions>([]);
+  // 섞인 Set 배열 상태
+  const [shuffledSets, setShuffledSets] = useState<typeof questions>([]);
 
   // 세션 코드 검증 함수
   const validateSessionCode = async (code: string): Promise<boolean> => {
@@ -123,22 +123,22 @@ function TestPageContent() {
       return;
     }
     
-    // 섞인 순서 복원 또는 생성
+    // 섞인 Set 순서 복원 또는 생성
     let shuffled: typeof questions;
     const savedOrder = storage.loadShuffledOrder(sessionCode);
     
-    if (savedOrder) {
-      // 저장된 순서가 있으면 그대로 사용
-      shuffled = savedOrder.map(id => questions.find(q => q.id === id)!).filter(Boolean);
+    if (savedOrder && savedOrder.length > 0) {
+      // 저장된 순서가 있으면 Set ID로 복원
+      shuffled = savedOrder.map(setId => questions.find(s => s.setId === setId)!).filter(Boolean);
     } else {
       // 저장된 순서가 없으면 새로 섞기
       const seed = generateSeedFromSessionCode(sessionCode);
       shuffled = shuffleArrayWithSeed(questions, seed);
-      // 섞인 순서 저장 (ID만 저장)
-      storage.saveShuffledOrder(sessionCode, shuffled.map(q => q.id));
+      // 섞인 순서 저장 (Set ID만 저장)
+      storage.saveShuffledOrder(sessionCode, shuffled.map(s => s.setId));
     }
     
-    setShuffledQuestions(shuffled);
+    setShuffledSets(shuffled);
     
     // localStorage에서 진행 상태 복원
     const savedAnswers = storage.loadAnswers();
@@ -160,101 +160,93 @@ function TestPageContent() {
     }
   }, [sessionCode]);
   
-  // 섞인 문항 배열이 준비되지 않았으면 빈 배열 사용
-  const questionsToUse = shuffledQuestions.length > 0 ? shuffledQuestions : questions;
-  const totalQuestions = questionsToUse.length;
+  // 섞인 Set 배열이 준비되지 않았으면 모든 Set 사용
+  const setsToUse = shuffledSets.length > 0 ? shuffledSets : questions;
+  const totalSets = setsToUse.length;
   const currentPartInfo = PARTS[currentPart];
-  const partQuestions = questionsToUse.slice(currentPartInfo.start, currentPartInfo.end + 1);
+  const partSets = setsToUse.slice(currentPartInfo.start, currentPartInfo.end + 1);
   
-  // 현재 파트 내에서 답변한 문항 수 계산
-  const answeredInPart = partQuestions.filter(q => 
-    answers[q.id] !== null && answers[q.id] !== undefined
-  ).length;
+  // 현재 파트 내에서 답변한 Set 수 계산 (두 문항 모두 답변된 Set만 카운트)
+  const answeredInPart = partSets.filter(set => {
+    const q1 = set.questions[0];
+    const q2 = set.questions[1];
+    return answers[q1.id] !== null && answers[q1.id] !== undefined &&
+           answers[q2.id] !== null && answers[q2.id] !== undefined;
+  }).length;
   
-  // 전체 답변한 문항 수 계산
-  // answers 객체에 저장된 모든 답변을 세며, null/undefined가 아닌 값을 카운트
-  const answeredCount = Object.keys(answers).filter(
-    (id) => answers[id] !== null && answers[id] !== undefined
-  ).length;
+  // 전체 답변한 Set 수 계산
+  const answeredCount = setsToUse.filter(set => {
+    const q1 = set.questions[0];
+    const q2 = set.questions[1];
+    return answers[q1.id] !== null && answers[q1.id] !== undefined &&
+           answers[q2.id] !== null && answers[q2.id] !== undefined;
+  }).length;
   
-  // progress는 answeredCount와 동일 (답이 선택되면 자동으로 answers에 저장되고 포함됨)
+  // progress는 answeredCount와 동일
   const progress = answeredCount;
 
-  // 현재 활성화된 문항의 답변 여부 확인
-  const isQuestionAnswered = (index: number) => {
-    const question = questionsToUse[index];
-    return question && answers[question.id] !== null && answers[question.id] !== undefined;
+  // 현재 Set의 답변 여부 확인
+  const isSetAnswered = (setIndex: number) => {
+    const set = setsToUse[setIndex];
+    if (!set) return false;
+    const q1 = set.questions[0];
+    const q2 = set.questions[1];
+    return answers[q1.id] !== null && answers[q1.id] !== undefined &&
+           answers[q2.id] !== null && answers[q2.id] !== undefined;
   };
 
-  // 현재 파트 내에서 다음 답변하지 않은 문항 찾기
+  // 현재 파트 내에서 다음 답변하지 않은 Set 찾기
   const getNextUnansweredInPart = () => {
     for (let i = currentPartInfo.start; i <= currentPartInfo.end; i++) {
-      if (!isQuestionAnswered(i)) {
+      if (!isSetAnswered(i)) {
         return i;
       }
     }
-    return null; // 파트 내 모든 문항 답변 완료
+    return null; // 파트 내 모든 Set 답변 완료
   };
 
-  const handleAnswerChange = (questionId: string, value: number) => {
+  // Set 기반 답변 변경 핸들러 (두 점수의 합이 7이 되도록)
+  const handleSetAnswerChange = (setId: string, value1: number, value2: number) => {
+    const set = setsToUse.find(s => s.setId === setId);
+    if (!set) return;
+    
+    const q1 = set.questions[0];
+    const q2 = set.questions[1];
+    
     const newAnswers = {
       ...answers,
-      [questionId]: value,
+      [q1.id]: value1,
+      [q2.id]: value2,
     };
     setAnswers(newAnswers);
     storage.saveAnswers(newAnswers);
-
-    // 현재 답변한 문항의 인덱스 찾기
-    const currentQuestionIndex = questionsToUse.findIndex(q => q.id === questionId);
-    const nextIndex = currentQuestionIndex + 1;
-    
-    // 다음 문항이 같은 파트 내에 있는지 확인
-    const isNextInSamePart = nextIndex <= currentPartInfo.end;
-    
-    // 같은 파트 내에서만 자동 스크롤 (다음 파트로 자동 이동하지 않음)
-    if (isNextInSamePart && nextIndex < totalQuestions) {
-      setTimeout(() => {
-        setActiveIndex(nextIndex);
-        storage.saveCurrentIndex(nextIndex);
-        
-        // 다음 문항 카드로 스크롤
-        const nextQuestionRef = questionRefs.current[nextIndex];
-        if (nextQuestionRef) {
-          nextQuestionRef.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-          });
-        }
-      }, 300);
-    }
-    // 마지막 문항이거나 다음 파트로 넘어가는 경우는 자동 이동하지 않음
   };
 
   const handleNextPart = () => {
-    // 현재 파트에서 답변하지 않은 문항 확인
+    // 현재 파트에서 답변하지 않은 Set 확인
     const unansweredInCurrentPart: number[] = [];
     for (let i = currentPartInfo.start; i <= currentPartInfo.end; i++) {
-      if (!isQuestionAnswered(i)) {
+      if (!isSetAnswered(i)) {
         unansweredInCurrentPart.push(i + 1); // 사용자에게 보여줄 때는 1부터 시작
       }
     }
     
-    // 답변하지 않은 문항이 있으면 팝업 표시
+    // 답변하지 않은 Set가 있으면 팝업 표시
     if (unansweredInCurrentPart.length > 0) {
       setUnansweredQuestions(unansweredInCurrentPart);
       setShowIncompleteModal(true);
       return;
     }
     
-    // 모든 문항이 답변되었으면 다음 파트로 이동
+    // 모든 Set가 답변되었으면 다음 파트로 이동
     if (currentPart < PARTS.length - 1) {
       const nextPart = currentPart + 1;
       const nextPartInfo = PARTS[nextPart];
       
-      // 다음 파트의 첫 번째 답변하지 않은 문항으로 이동
+      // 다음 파트의 첫 번째 답변하지 않은 Set로 이동
       let nextIndex = nextPartInfo.start;
       for (let i = nextPartInfo.start; i <= nextPartInfo.end; i++) {
-        if (!isQuestionAnswered(i)) {
+        if (!isSetAnswered(i)) {
           nextIndex = i;
           break;
         }
@@ -279,10 +271,10 @@ function TestPageContent() {
       const prevPart = currentPart - 1;
       const prevPartInfo = PARTS[prevPart];
       
-      // 이전 파트의 첫 번째 문항으로 이동
+      // 이전 파트의 첫 번째 Set로 이동
       let prevIndex = prevPartInfo.start;
       for (let i = prevPartInfo.start; i <= prevPartInfo.end; i++) {
-        if (!isQuestionAnswered(i)) {
+        if (!isSetAnswered(i)) {
           prevIndex = i;
           break;
         }
@@ -299,54 +291,8 @@ function TestPageContent() {
     }
   };
 
-  // 현재 활성 문항만 표시
-  const currentQuestion = questionsToUse[activeIndex];
-  const isLastQuestion = activeIndex === totalQuestions - 1;
-  const isFirstQuestion = activeIndex === 0;
-
-  // 이전 문항으로 이동
-  const handlePreviousQuestion = () => {
-    if (activeIndex > 0) {
-      const prevIndex = activeIndex - 1;
-      setActiveIndex(prevIndex);
-      storage.saveCurrentIndex(prevIndex);
-      
-      // 이전 문항이 다른 파트에 있으면 파트 변경
-      const prevPart = PARTS.findIndex(part => 
-        prevIndex >= part.start && prevIndex <= part.end
-      );
-      if (prevPart !== -1 && prevPart !== currentPart) {
-        setCurrentPart(prevPart);
-      }
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  // 다음 문항으로 이동
-  const handleNextQuestion = () => {
-    if (activeIndex < totalQuestions - 1) {
-      const nextIndex = activeIndex + 1;
-      setActiveIndex(nextIndex);
-      storage.saveCurrentIndex(nextIndex);
-      
-      // 다음 문항이 다른 파트에 있으면 파트 변경
-      const nextPart = PARTS.findIndex(part => 
-        nextIndex >= part.start && nextIndex <= part.end
-      );
-      if (nextPart !== -1 && nextPart !== currentPart) {
-        setCurrentPart(nextPart);
-      }
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // 모든 문항 완료 - 결과 페이지로 이동
-      router.push('/result');
-    }
-  };
-
-  // 세션 코드 검증 중이거나 (세션 코드가 있고 섞인 문항 배열이 준비되지 않은 경우) 로딩 화면 표시
-  if (sessionValidating || (sessionCode && shuffledQuestions.length === 0)) {
+  // 세션 코드 검증 중이거나 (세션 코드가 있고 섞인 Set 배열이 준비되지 않은 경우) 로딩 화면 표시
+  if (sessionValidating || (sessionCode && shuffledSets.length === 0)) {
     return (
       <main className="py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 relative overflow-y-auto flex items-center justify-center">
         {/* 배경 그라데이션 */}
@@ -397,39 +343,44 @@ function TestPageContent() {
         )}
         {/* 안내 문구 */}
         <div className="mb-3 sm:mb-4 md:mb-5 animate-fade-in">
-          <ProgressBar current={progress} total={totalQuestions} />
+          <ProgressBar current={progress} total={totalSets} />
           <div className="mt-4 sm:mt-5 text-center">
             <div className="mt-1.5 sm:mt-2 text-center">
-              <p className="text-[25px] sm:text-[29px] md:text-[33px] text-gray-600 font-bold px-2 break-keep leading-[1.2]">
-                현재 당신의 리더십 방식과 얼마나 일치하는지 선택해 주세요.
+              <p className="text-[20px] sm:text-[24px] md:text-[28px] text-gray-600 font-bold px-2 break-keep leading-[1.2]">
+                두 문항 중 어느 쪽에 더 동의하시나요?<br />
+                <span className="text-base sm:text-lg md:text-xl font-normal">중간의 닷을 눌러 총 7점을 배분해주세요.</span>
               </p>
               {/* 범례 */}
-              <div className="flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 text-sm sm:text-base md:text-lg text-gray-600 flex-wrap mt-3 sm:mt-4">
-                <span>1: 전혀 일치하지 않는다</span>
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 text-xs sm:text-sm md:text-base text-gray-600 flex-wrap mt-3 sm:mt-4">
+                <span>왼쪽 문항에 더 동의</span>
                 <span className="text-gray-400">|</span>
-                <span>4: 보통이다</span>
+                <span>균형</span>
                 <span className="text-gray-400">|</span>
-                <span>7: 매우 일치한다</span>
+                <span>오른쪽 문항에 더 동의</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 문항 카드 영역 - 현재 파트의 모든 문항 표시 */}
-        <div className="w-full max-w-4xl mx-auto py-3 sm:py-4 space-y-4 sm:space-y-6">
-          {partQuestions.map((question, index) => {
-            const questionIndex = currentPartInfo.start + index;
+        {/* Set 카드 영역 - 현재 파트의 모든 Set 표시 */}
+        <div className="w-full max-w-6xl mx-auto py-3 sm:py-4 space-y-4 sm:space-y-6">
+          {partSets.map((set, index) => {
+            const setIndex = currentPartInfo.start + index;
+            const q1 = set.questions[0];
+            const q2 = set.questions[1];
             return (
               <div
-                key={question.id}
+                key={set.setId}
                 ref={(el) => {
-                  questionRefs.current[questionIndex] = el;
+                  questionRefs.current[setIndex] = el;
                 }}
               >
-                <QuestionCard
-                  statement={question.statement}
-                  value={answers[question.id] || null}
-                  onChange={(value) => handleAnswerChange(question.id, value)}
+                <QuestionSetCard
+                  question1={q1}
+                  question2={q2}
+                  value1={answers[q1.id] || null}
+                  value2={answers[q2.id] || null}
+                  onChange={(value1, value2) => handleSetAnswerChange(set.setId, value1, value2)}
                   disabled={false}
                 />
               </div>
@@ -466,12 +417,12 @@ function TestPageContent() {
           {currentPart === PARTS.length - 1 && (
             <button
               onClick={() => {
-                // 모든 문항이 답변되었는지 확인
-                const allAnswered = totalQuestions === answeredCount;
+                // 모든 Set가 답변되었는지 확인
+                const allAnswered = totalSets === answeredCount;
                 if (allAnswered) {
                   router.push('/result');
                 } else {
-                  // 답변하지 않은 문항이 있으면 알림
+                  // 답변하지 않은 Set가 있으면 알림
                   alert('모든 문항에 답변해주세요.');
                 }
               }}

@@ -24,7 +24,7 @@ const testCases = [
       M1: 7, M2: 6, M3: 7, M4: 6, M5: 7, M6: 6, M7: 7, M8: 6,
       // Flexibility: 모두 높은 점수 (Change 우세)
       F9: 6, F10: 7, F11: 6, F12: 7, F13: 6, F14: 7, F15: 6, F16: 7,
-      // Direction: 모두 높은 점수 (Results 우세)
+      // Direction: 모두 높은 점수 (Work 우세)
       D17: 7, D18: 6, D19: 7, D20: 6, D21: 7, D22: 6, D23: 7, D24: 6,
       // Communication: 모두 높은 점수 (Direct 우세)
       C25: 6, C26: 7, C27: 6, C28: 7, C29: 6, C30: 7, C31: 6, C32: 7,
@@ -39,7 +39,7 @@ const testCases = [
       M1: 4, M2: 4, M3: 4, M4: 4, M5: 4, M6: 4, M7: 4, M8: 4,
       // Flexibility: Change 우세
       F9: 6, F10: 6, F11: 6, F12: 6, F13: 6, F14: 6, F15: 6, F16: 6,
-      // Direction: Results 우세
+      // Direction: Work 우세
       D17: 6, D18: 6, D19: 6, D20: 6, D21: 6, D22: 6, D23: 6, D24: 6,
       // Communication: Direct 우세
       C25: 6, C26: 6, C27: 6, C28: 6, C29: 6, C30: 6, C31: 6, C32: 6,
@@ -78,7 +78,7 @@ const testCases = [
       D17: 7, D18: 7, D19: 7, D20: 7, D21: 7, D22: 7, D23: 7, D24: 7,
       C25: 7, C26: 7, C27: 7, C28: 7, C29: 7, C30: 7, C31: 7, C32: 7,
     } as Answers,
-    expectedCode: 'ICRD', // 모두 높은 점수이므로 Intrinsic/Change/Results/Direct
+    expectedCode: 'ICRD', // 모두 높은 점수이므로 Intrinsic/Change/Work/Direct
   },
 ];
 

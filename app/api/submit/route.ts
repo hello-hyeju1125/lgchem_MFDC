@@ -4,7 +4,7 @@
  * POST /api/submit
  * 
  * 익명 사용자가 진단 결과를 제출합니다.
- * - session_code와 40문항의 응답(answers)을 받습니다
+ * - session_code와 32문항의 응답(answers)을 받습니다
  * - 점수를 계산하고 responses 테이블에 저장합니다
  * - 개인 결과 요약을 반환합니다 (개인 화면용)
  * 
@@ -31,10 +31,10 @@ const SubmitSchema = z.object({
           ([_, value]) => value !== null && value !== undefined && typeof value === 'number'
         );
         const count = validAnswers.length;
-        // 현재 문항 수(40개)에 모두 답변했는지 검증
-        return count === 40;
+        // 현재 문항 수(32개)에 모두 답변했는지 검증
+        return count === 32;
       },
-      '40개 문항에 모두 응답해야 합니다'
+      '32개 문항에 모두 응답해야 합니다'
     ),
   clientHash: z.string().optional(), // 중복 제출 방지용 (선택사항)
   participantName: z

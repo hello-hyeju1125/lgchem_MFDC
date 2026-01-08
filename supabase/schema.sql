@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS question_map (
   id INTEGER PRIMARY KEY,  -- 1~32 (문항 번호)
   question_id TEXT UNIQUE NOT NULL,  -- "M1", "M2", ..., "C32" (문항 ID)
   axis TEXT NOT NULL CHECK (axis IN ('motivation', 'flexibility', 'direction', 'communication')),
-  pole TEXT NOT NULL,  -- 'intrinsic', 'extrinsic', 'change', 'system', 'results', 'people', 'direct', 'engage'
+  pole TEXT NOT NULL,  -- 'intrinsic', 'extrinsic', 'change', 'system', 'work', 'people', 'direct', 'engage'
   reverse_scored BOOLEAN DEFAULT FALSE,  -- 역채점 필요 시 true (현재 로직에서는 사용 안 함)
   weight NUMERIC DEFAULT 1.0,  -- 가중치 (기본 1.0)
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -214,7 +214,7 @@ BEGIN
       (r.axis_scores->'flexibility'->>'change')::NUMERIC AS flexibility_change,
       (r.axis_scores->'flexibility'->>'system')::NUMERIC AS flexibility_system,
       (r.pole->>'direction')::TEXT AS direction_pole,
-      (r.axis_scores->'direction'->>'results')::NUMERIC AS direction_results,
+      (r.axis_scores->'direction'->>'work')::NUMERIC AS direction_work,
       (r.axis_scores->'direction'->>'people')::NUMERIC AS direction_people,
       (r.pole->>'communication')::TEXT AS communication_pole,
       (r.axis_scores->'communication'->>'direct')::NUMERIC AS communication_direct,
@@ -247,12 +247,12 @@ BEGIN
   SELECT 
     'direction'::TEXT AS axis,
     jsonb_build_object(
-      'results', ROUND((COUNT(*) FILTER (WHERE direction_pole = 'results')::NUMERIC / v_total_count::NUMERIC)::NUMERIC, 4),
+      'work', ROUND((COUNT(*) FILTER (WHERE direction_pole = 'work')::NUMERIC / v_total_count::NUMERIC)::NUMERIC, 4),
       'people', ROUND((COUNT(*) FILTER (WHERE direction_pole = 'people')::NUMERIC / v_total_count::NUMERIC)::NUMERIC, 4),
       'balanced', ROUND((COUNT(*) FILTER (WHERE direction_pole = 'balanced')::NUMERIC / v_total_count::NUMERIC)::NUMERIC, 4)
     ) AS pole_distribution,
-    ROUND(AVG(direction_results + direction_people)::NUMERIC, 2) AS mean_score,
-    ROUND(STDDEV(direction_results + direction_people)::NUMERIC, 2) AS stddev_score
+    ROUND(AVG(direction_work + direction_people)::NUMERIC, 2) AS mean_score,
+    ROUND(STDDEV(direction_work + direction_people)::NUMERIC, 2) AS stddev_score
   FROM axis_data
   UNION ALL
   SELECT 
@@ -364,8 +364,8 @@ VALUES
   (15, 'F15', 'flexibility', 'change', false, 1.0),
   (16, 'F16', 'flexibility', 'change', false, 1.0),
   
-  -- Direction 축 (D17-D24: 모두 Results)
-  (17, 'D17', 'direction', 'results', false, 1.0),
+  -- Direction 축 (D17-D24: 모두 Work)
+  (17, 'D17', 'direction', 'work', false, 1.0),
   (18, 'D18', 'direction', 'results', false, 1.0),
   (19, 'D19', 'direction', 'results', false, 1.0),
   (20, 'D20', 'direction', 'results', false, 1.0),

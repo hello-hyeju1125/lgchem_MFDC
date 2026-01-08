@@ -51,7 +51,7 @@ function getPolesFromType(type: string) {
   return {
     motivation: type[0] === 'I' ? 'intrinsic' : 'extrinsic',
     flexibility: type[1] === 'C' ? 'change' : 'system',
-    direction: type[2] === 'R' ? 'results' : 'people',
+    direction: type[2] === 'R' ? 'work' : 'people',
     communication: type[3] === 'D' ? 'direct' : 'engage', // 'N'도 'engage'로 처리
   };
 }
@@ -83,9 +83,9 @@ function generateAnswers(poles: ReturnType<typeof getPolesFromType>) {
       : 1 + Math.floor(Math.random() * 3);
   }
   
-  // Direction 축 (D17-D24: Results)
+  // Direction 축 (D17-D24: Work)
   for (let i = 17; i <= 24; i++) {
-    answers[`D${i}`] = poles.direction === 'results'
+    answers[`D${i}`] = poles.direction === 'work'
       ? 4 + Math.floor(Math.random() * 4)
       : 1 + Math.floor(Math.random() * 3);
   }
@@ -168,7 +168,7 @@ async function insertTestData() {
             system: generateScores('system', poles.flexibility === 'system'),
           },
           direction: {
-            results: generateScores('results', poles.direction === 'results'),
+            work: generateScores('work', poles.direction === 'work'),
             people: generateScores('people', poles.direction === 'people'),
           },
           communication: {

@@ -11,8 +11,8 @@ const DIMENSION_DESCRIPTIONS: Record<string, string> = {
   Extrinsic: '외재적 동기 기반',
   Change: '변화 지향',
   System: '관리 지향',
-  Results: '성과 중심',
-  People: '관계 중심',
+  Work: '일 중심',
+  People: '사람 중심',
   Direct: '지시형 소통',
   eNgage: '참여형 소통',
 };
@@ -149,7 +149,7 @@ export default function ResultCodePage() {
       const axisConfig = {
         Motivation: { dimension1: 'Intrinsic', dimension2: 'Extrinsic', code1: 'I', code2: 'E' },
         Flexibility: { dimension1: 'Change', dimension2: 'System', code1: 'C', code2: 'S' },
-        Direction: { dimension1: 'Results', dimension2: 'People', code1: 'R', code2: 'P' },
+        Direction: { dimension1: 'Work', dimension2: 'People', code1: 'R', code2: 'P' },
         Communication: { dimension1: 'Direct', dimension2: 'eNgage', code1: 'D', code2: 'N' },
       };
       
@@ -333,31 +333,31 @@ export default function ResultCodePage() {
         <section className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
             {result.scores.map((axisScore, index) => {
-              // 축별 색상 조합 (좌우 그라데이션, 아래쪽 색상으로 구분)
-              const axisColors: Record<string, { from: string; to: string; fromColor: string; toColor: string }> = {
+              // 축별 색상 (각 축마다 고유한 색상)
+              const axisColors: Record<string, { 
+                mainColor: string; 
+                lightColor: string; 
+                darkColor: string;
+              }> = {
                 'Motivation': { 
-                  from: 'from-purple-600', 
-                  to: 'to-pink-500', 
-                  fromColor: '#9333ea', // 퍼플
-                  toColor: '#ec4899' // 마젠타
+                  mainColor: '#9333ea', // 퍼플
+                  lightColor: '#a855f7', // 밝은 퍼플
+                  darkColor: '#7e22ce' // 어두운 퍼플
                 },
                 'Flexibility': { 
-                  from: 'from-green-500', 
-                  to: 'to-emerald-300', 
-                  fromColor: '#22c55e', // 그린
-                  toColor: '#6ee7b7' // 민트
+                  mainColor: '#22c55e', // 그린
+                  lightColor: '#4ade80', // 밝은 그린
+                  darkColor: '#16a34a' // 어두운 그린
                 },
                 'Direction': { 
-                  from: 'from-pink-500', 
-                  to: 'to-pink-300', 
-                  fromColor: '#ec4899', // 마젠타
-                  toColor: '#f9a8d4' // 핑크
+                  mainColor: '#ec4899', // 마젠타
+                  lightColor: '#f472b6', // 밝은 마젠타
+                  darkColor: '#db2777' // 어두운 마젠타
                 },
                 'Communication': { 
-                  from: 'from-sky-400', 
-                  to: 'to-indigo-900', 
-                  fromColor: '#38bdf8', // 라이트 블루
-                  toColor: '#312e81' // 네이비
+                  mainColor: '#3b82f6', // 블루
+                  lightColor: '#60a5fa', // 밝은 블루
+                  darkColor: '#2563eb' // 어두운 블루
                 },
               };
               const colorScheme = axisColors[axisScore.axis] || axisColors['Motivation'];
@@ -405,86 +405,13 @@ export default function ResultCodePage() {
                       </div>
                     </div>
 
-                    {/* 슬라이더 바 */}
-                    <div className="relative w-full">
-                      {/* 경계선을 가리키는 아래로 향하는 화살표 */}
-                      <div 
-                        className="absolute -top-6 sm:-top-7 md:-top-8 left-0 flex justify-center z-10 pointer-events-none"
-                        style={{ left: `${percent1}%`, transform: 'translateX(-50%)' }}
-                      >
-                        <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      
-                      <div className="relative flex items-center w-full h-10 sm:h-12 md:h-14 bg-brand-light-gray/20 rounded-full overflow-hidden">
-                        {/* 전체 그라데이션 배경 - 매우 부드러운 전환 (주요 레이어) */}
-                        <div 
-                          className="absolute inset-0 h-full transition-all duration-700 rounded-full z-0"
-                          style={{
-                            background: axisScore.axis === 'Communication'
-                              ? `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`
-                              : `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`
-                          }}
-                        />
-                        
-                        {/* 왼쪽 영역 - 반투명 오버레이로 경계 부드럽게 */}
-                        <div 
-                          className="relative h-full transition-all duration-700 rounded-l-full z-10"
-                          style={{ 
-                            width: `${percent1}%`,
-                            background: axisScore.axis === 'Communication' && percent1 > 0 && percent2 > 0
-                              ? `linear-gradient(to right, ${colorScheme.fromColor}cc, ${colorScheme.fromColor}77, ${colorScheme.fromColor}33, transparent)`
-                              : percent1 > 0 && percent2 > 0 
-                              ? `linear-gradient(to right, ${colorScheme.fromColor}ee, ${colorScheme.fromColor}88, transparent)`
-                              : `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.fromColor})`
-                          }}
-                        >
-                          {/* 위쪽 하이라이트 */}
-                          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-l-full" />
-                        </div>
-                        
-                        {/* 오른쪽 영역 - 반투명 오버레이로 경계 부드럽게 */}
-                        <div 
-                          className="relative h-full transition-all duration-700 rounded-r-full ml-auto z-10"
-                          style={{ 
-                            width: `${percent2}%`,
-                            background: axisScore.axis === 'Communication' && percent1 > 0 && percent2 > 0
-                              ? `linear-gradient(to left, ${colorScheme.toColor}cc, ${colorScheme.toColor}77, ${colorScheme.toColor}33, transparent)`
-                              : percent1 > 0 && percent2 > 0
-                              ? `linear-gradient(to left, ${colorScheme.toColor}ee, ${colorScheme.toColor}88, transparent)`
-                              : `linear-gradient(to left, ${colorScheme.toColor}, ${colorScheme.toColor})`
-                          }}
-                        >
-                          {/* 위쪽 하이라이트 */}
-                          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-r-full" />
-                        </div>
-                        
-                        {/* 중간 경계 그라데이션 오버레이 - 매우 넓게 블렌딩하여 경계 완전히 숨김 */}
-                        {percent1 > 0 && percent2 > 0 && (
-                          <div 
-                            className="absolute top-0 bottom-0 pointer-events-none z-20"
-                            style={{
-                              left: `calc(${percent1}% - ${axisScore.axis === 'Communication' ? '60px' : '50px'})`,
-                              width: axisScore.axis === 'Communication' ? '120px' : '100px',
-                              background: axisScore.axis === 'Communication'
-                                ? `linear-gradient(to right, ${colorScheme.fromColor}00, ${colorScheme.fromColor}22, ${colorScheme.fromColor}55, ${colorScheme.fromColor}88, ${colorScheme.toColor}88, ${colorScheme.toColor}55, ${colorScheme.toColor}22, ${colorScheme.toColor}00)`
-                                : `linear-gradient(to right, ${colorScheme.fromColor}00, ${colorScheme.fromColor}44, ${colorScheme.fromColor}88, ${colorScheme.toColor}88, ${colorScheme.toColor}44, ${colorScheme.toColor}00)`
-                            }}
-                          />
-                        )}
-                      </div>
-                    </div>
-
                     {/* 퍼센트 표시 */}
-                    <div className="flex justify-between items-center mt-4">
+                    <div className="flex justify-between items-center mb-4">
                       <div className="flex flex-col items-start">
                         <span 
-                          className="font-bold text-lg sm:text-xl md:text-2xl bg-clip-text text-transparent"
+                          className="font-bold text-lg sm:text-xl md:text-2xl"
                           style={{ 
-                            backgroundImage: `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
+                            color: colorScheme.mainColor
                           }}
                         >
                           {percent1}%
@@ -492,15 +419,55 @@ export default function ResultCodePage() {
                       </div>
                       <div className="flex flex-col items-end">
                         <span 
-                          className="font-bold text-lg sm:text-xl md:text-2xl bg-clip-text text-transparent"
+                          className="font-bold text-lg sm:text-xl md:text-2xl"
                           style={{ 
-                            backgroundImage: `linear-gradient(to right, ${colorScheme.fromColor}, ${colorScheme.toColor})`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
+                            color: colorScheme.mainColor
                           }}
                         >
                           {percent2}%
                         </span>
+                      </div>
+                    </div>
+
+                    {/* 슬라이더 바 */}
+                    <div className="relative w-full">
+                      <div className="relative flex items-center w-full h-10 sm:h-12 md:h-14 bg-gray-200/30 rounded-full overflow-hidden">
+                        {/* 왼쪽 영역 - 단색 */}
+                        <div 
+                          className="relative h-full transition-all duration-700 rounded-l-full z-10"
+                          style={{ 
+                            width: `${percent1}%`,
+                            backgroundColor: colorScheme.lightColor,
+                          }}
+                        >
+                          {/* 위쪽 하이라이트 */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-l-full" />
+                        </div>
+                        
+                        {/* 오른쪽 영역 - 단색 */}
+                        <div 
+                          className="relative h-full transition-all duration-700 rounded-r-full ml-auto z-10"
+                          style={{ 
+                            width: `${percent2}%`,
+                            backgroundColor: colorScheme.darkColor,
+                          }}
+                        >
+                          {/* 위쪽 하이라이트 */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-r-full" />
+                        </div>
+                        
+                        {/* 경계 세로 선 */}
+                        {percent1 > 0 && percent2 > 0 && (
+                          <div 
+                            className="absolute top-0 bottom-0 pointer-events-none z-30"
+                            style={{
+                              left: `${percent1}%`,
+                              width: '2px',
+                              backgroundColor: colorScheme.mainColor,
+                              boxShadow: `0 0 4px ${colorScheme.mainColor}cc`,
+                            }}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

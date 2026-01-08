@@ -1,285 +1,290 @@
 [
   {
-    "id": "MOT_01_L",
+    "setId": "MOT_01",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 구성원이 이 일이 왜 중요한지 이해하도록 돕는 것이 동기부여의 핵심이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "MOT_01_L",
+        "dimension": "Intrinsic",
+        "statement": "구성원들은 자신의 일이 의미 있고 성장에 도움이 된다고 느낄때 강하게 몰입한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "MOT_01_R",
+        "dimension": "Extrinsic",
+        "statement": "구성원들은 명확한 보상과 평가, 승진이 걸려 있을 때 강하게 몰입한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "MOT_01_R",
+    "setId": "MOT_02",
     "axis": "Motivation",
-    "dimension": "Extrinsic",
-    "statement": "나는 구성원이 성과를 내면 보상이나 평가가 명확히 따라야 한다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "MOT_02_L",
+        "dimension": "Intrinsic",
+        "statement": "목표는 개인이 스스로 의미를 느끼고 주도적으로 설정할 때 효과적이다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "MOT_02_R",
+        "dimension": "Extrinsic",
+        "statement": "목표는 조직이 명확하게 정하고 달성 여부에 따라 보상이 달라질 때 효과적이다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "MOT_02_L",
+    "setId": "MOT_03",
     "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 구성원이 일 그 자체에서 의미를 느낄 때 더 몰입한다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "MOT_03_L",
+        "dimension": "Intrinsic",
+        "statement": "리더의 가장 중요한 역할은 구성원 스스로 동기부여 될 수 있는 환경을 만들어 주는 것이다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "MOT_03_R",
+        "dimension": "Extrinsic",
+        "statement": "리더의 가장 중요한 역할은 성과기준을 명확히 하고 하고 결과에 따라 공정하게 보상 하는 것이다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "MOT_02_R",
+    "setId": "MOT_04",
     "axis": "Motivation",
-    "dimension": "Extrinsic",
-    "statement": "나는 승진·보상·인정이 구성원의 행동을 가장 강하게 이끈다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "MOT_04_L",
+        "dimension": "Intrinsic",
+        "statement": "구성원이 일 자체에서 재미와 의미를 느끼도록 만드는 것을 중요하게 생각한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "MOT_04_R",
+        "dimension": "Extrinsic",
+        "statement": "구성원이 외부에서 인정받고 평가받는 경험을 중요하게 생각한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "MOT_03_L",
-    "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 새로운 과제가 구성원의 성장을 자극하는 동기 요인이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "MOT_03_R",
-    "axis": "Motivation",
-    "dimension": "Extrinsic",
-    "statement": "나는 외부의 기대와 평가가 분명할수록 구성원이 더 성과를 낸다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "MOT_04_L",
-    "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 구성원에게 자율성을 줄수록 책임감이 높아진다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "MOT_04_R",
-    "axis": "Motivation",
-    "dimension": "Extrinsic",
-    "statement": "나는 명확한 목표·기준·보상 체계가 동기부여에 필수적이라고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "MOT_05_L",
-    "axis": "Motivation",
-    "dimension": "Intrinsic",
-    "statement": "나는 구성원이 스스로 목표와 방법을 정할 때 동기 수준이 높아진다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "MOT_05_R",
-    "axis": "Motivation",
-    "dimension": "Extrinsic",
-    "statement": "나는 성과에 따른 보상이 동기의 핵심 장치라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-
-  {
-    "id": "FLX_01_L",
+    "setId": "FLX_01",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 새로운 방식을 시도하며 기존과 다른 해결책을 찾는 편이다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "FLX_01_L",
+        "dimension": "Change",
+        "statement": "회사 또는 담당 조직 고유의 강점을 살리는 창의적인 대안을 모색한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "FLX_01_R",
+        "dimension": "System",
+        "statement": "업무 수행 시, 불필요한 낭비를 방지하기 위해 자원 및 시간의 효율적 관리를 강조한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "FLX_01_R",
+    "setId": "FLX_02",
     "axis": "Flexibility",
-    "dimension": "System",
-    "statement": "나는 검증된 절차와 규정을 지키는 것이 가장 안전한 선택이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "FLX_02_L",
+        "dimension": "Change",
+        "statement": "사업이나 업무의 맥을 짚고, 미래의 변화 방향을 제시하여 새로운 시도를 한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "FLX_02_R",
+        "dimension": "System",
+        "statement": "분석적인 시각으로 현재 진행 중인 주요 업무나 결과를 꼼꼼히 점검한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "FLX_02_L",
+    "setId": "FLX_03",
     "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 위기 상황에서도 과감한 새로운 대안을 검토해야 한다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "FLX_03_L",
+        "dimension": "Change",
+        "statement": "기존의 업무 프로세스나 절차 보다는 새로운 업무 방식을 강조하며 구성원들의 변화에 대한 공감을 이끌어 낸다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "FLX_03_R",
+        "dimension": "System",
+        "statement": "업무 프로세스나 수행 절차의 체계화/표준화를 강조하여, 업무 효율과 일관성을 유지한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "FLX_02_R",
+    "setId": "FLX_04",
     "axis": "Flexibility",
-    "dimension": "System",
-    "statement": "나는 위기 상황에서는 리스크를 최소화하는 것이 최우선이라고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "FLX_04_L",
+        "dimension": "Change",
+        "statement": "변화와 혁신을 시도하기 위해 소신껏 경영진의 지지와 구성원들의 동참을 이끌어낸다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "FLX_04_R",
+        "dimension": "System",
+        "statement": "위기/돌발 상황이 발생하지 않도록, 사전에 주도 면밀한 계획을 세우고 업무를 추진한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "FLX_03_L",
-    "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 환경 변화에 맞춰 전략이나 방식을 빠르게 바꾸는 것이 중요하다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "FLX_03_R",
-    "axis": "Flexibility",
-    "dimension": "System",
-    "statement": "나는 변화보다는 현재의 안정성을 유지하는 것이 더 중요하다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "FLX_04_L",
-    "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 불확실성을 위험이기보다 기회로 인식하는 편이다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "FLX_04_R",
-    "axis": "Flexibility",
-    "dimension": "System",
-    "statement": "나는 불확실성을 줄이고 예측 가능성을 높이는 데 집중하는 편이다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "FLX_05_L",
-    "axis": "Flexibility",
-    "dimension": "Change",
-    "statement": "나는 새로운 시도를 통해 경쟁 우위를 만들 수 있다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "FLX_05_R",
-    "axis": "Flexibility",
-    "dimension": "System",
-    "statement": "나는 절차와 기준을 지키는 것이 조직의 신뢰성을 높인다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-
-  {
-    "id": "DIR_01_L",
+    "setId": "DIR_01",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "나는 목표 달성이 리더의 가장 중요한 역할이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "DIR_01_L",
+        "dimension": "People",
+        "statement": "구성원들의 업무상 고충이나 애로 사항 등에 항상 관심을 갖고 경청하며, 이를 극복할 수 있도록 도움을 준다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "DIR_01_R",
+        "dimension": "Work",
+        "statement": "애초에 수립한 목표에 어려움이 있더라도 포기하지 않고 반드시 달성하는 집념과 끈기가 있다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "DIR_01_R",
+    "setId": "DIR_02",
     "axis": "Direction",
-    "dimension": "People",
-    "statement": "나는 팀원의 만족과 관계 유지가 리더의 핵심 역할이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "DIR_02_L",
+        "dimension": "People",
+        "statement": "구성원들의 능력과 적성을 고려하여 성장할 수 있도록 배려(교육, 육성, 적절한 역할 책임 부여 등)를 제공한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "DIR_02_R",
+        "dimension": "Work",
+        "statement": "구성원들에게 구체적인 목표나 가이드라인을 주고 목표 달성 여부를 철저히 챙긴다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "DIR_02_L",
+    "setId": "DIR_03",
     "axis": "Direction",
-    "dimension": "Results",
-    "statement": "나는 성과 지표가 리더십의 성공을 가장 명확히 보여준다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "DIR_03_L",
+        "dimension": "People",
+        "statement": "팀 공동의 목표 달성에 대한 구성원들의 공감과 몰입을 이끌어낸다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "DIR_03_R",
+        "dimension": "Work",
+        "statement": "구성원 개인의 목표를 명확히 하고 업무 우선순위를 부여하여, 성과를 낼 수 있도록 독려한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "DIR_02_R",
+    "setId": "DIR_04",
     "axis": "Direction",
-    "dimension": "People",
-    "statement": "나는 신뢰와 팀워크가 성과보다 선행되어야 한다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "DIR_04_L",
+        "dimension": "People",
+        "statement": "구성원들 간의 의견 불일치, 인간 관계 갈등 등의 중재자 역할을 잘 한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "DIR_04_R",
+        "dimension": "Work",
+        "statement": "구성원 간의 경쟁심을 적절히 활용하여 목표 달성 의지를 높인다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "DIR_03_L",
-    "axis": "Direction",
-    "dimension": "Results",
-    "statement": "나는 도전적인 목표를 제시할 때 팀의 성과가 높아진다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "DIR_03_R",
-    "axis": "Direction",
-    "dimension": "People",
-    "statement": "나는 구성원에게 정서적 지지를 제공할 때 지속적인 성과가 나온다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "DIR_04_L",
-    "axis": "Direction",
-    "dimension": "Results",
-    "statement": "나는 리더 평가는 결과와 성과를 기준으로 이루어져야 한다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "DIR_04_R",
-    "axis": "Direction",
-    "dimension": "People",
-    "statement": "나는 심리적 안전감이 리더십의 중요한 기준이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "DIR_05_L",
-    "axis": "Direction",
-    "dimension": "Results",
-    "statement": "나는 성과를 만들지 못하면 리더십의 설득력이 약해진다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "DIR_05_R",
-    "axis": "Direction",
-    "dimension": "People",
-    "statement": "나는 관계가 무너지면 성과 중심 리더십은 한계가 있다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-
-  {
-    "id": "COM_01_L",
+    "setId": "COM_01",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 리더가 방향을 명확히 지시하는 것이 가장 효율적이라고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "COM_01_L",
+        "dimension": "Direct",
+        "statement": "중요한 결정일수록 리더가 빠르게 판단하고 명확히 방향을 제시해야 한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "COM_01_R",
+        "dimension": "Engage",
+        "statement": "중요한 결정일수록 구성원들의 의견을 충분히 수렴한 후 함께 방향을 정해야 한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "COM_01_R",
+    "setId": "COM_02",
     "axis": "Communication",
-    "dimension": "Engage",
-    "statement": "나는 중요한 결정일수록 구성원과의 논의와 합의가 필요하다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "COM_02_L",
+        "dimension": "Direct",
+        "statement": "속도가 필요할 때는 설명보다 즉각적인 지시와 실행이 우선이다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "COM_02_R",
+        "dimension": "Engage",
+        "statement": "속도가 필요해도, 구성원이 이해하고 동의할 시간을 갖는 것이 장기적으로 더 빠르다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "COM_02_L",
+    "setId": "COM_03",
     "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 지시와 통제가 조직 성과를 높이는 데 효과적이라고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "COM_03_L",
+        "dimension": "Direct",
+        "statement": "리더는 회의 초반에 결론과 방향을 제시하고, 토론은 실행 방법에 집중해야 한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "COM_03_R",
+        "dimension": "Engage",
+        "statement": "리더는 주로 질문을 던지고, 결론은 팀의 토론을 통해 도출되게 해야 한다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   },
   {
-    "id": "COM_02_R",
+    "setId": "COM_04",
     "axis": "Communication",
-    "dimension": "Engage",
-    "statement": "나는 참여와 협의가 조직의 실행력을 높인다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "COM_03_L",
-    "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 보통 방향을 먼저 제시하고 구성원이 실행하도록 한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "COM_03_R",
-    "axis": "Communication",
-    "dimension": "Engage",
-    "statement": "나는 구성원의 의견을 적극적으로 듣고 반영하는 편이다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "COM_04_L",
-    "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 구체적이고 명확한 지시가 혼선을 줄인다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "COM_04_R",
-    "axis": "Communication",
-    "dimension": "Engage",
-    "statement": "나는 권한을 위임할수록 구성원의 주도성이 높아진다고 본다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "COM_05_L",
-    "axis": "Communication",
-    "dimension": "Direct",
-    "statement": "나는 구성원에게 자율보다 명확한 가이드가 더 필요하다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
-  },
-  {
-    "id": "COM_05_R",
-    "axis": "Communication",
-    "dimension": "Engage",
-    "statement": "나는 자율적인 의사결정 구조가 혁신을 촉진한다고 생각한다.",
-    "scale": { "min": 1, "max": 7, "midpoint": 4 }
+    "questions": [
+      {
+        "id": "COM_04_L",
+        "dimension": "Direct",
+        "statement": "최종 책임은 리더에게 있으므로, 의사결정 권한도 리더에게 집중되는 것이 합리적이다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      },
+      {
+        "id": "COM_04_R",
+        "dimension": "Engage",
+        "statement": "구성원이 의사결정에 참여할수록 결과에 대한 주인의식과 책임감이 커진다.",
+        "scale": { "min": 1, "max": 7, "midpoint": 4 }
+      }
+    ]
   }
 ]

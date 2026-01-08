@@ -33,7 +33,7 @@ DECLARE
   v_motivation_extrinsic NUMERIC;
   v_flexibility_change NUMERIC;
   v_flexibility_system NUMERIC;
-  v_direction_results NUMERIC;
+  v_direction_work NUMERIC;
   v_direction_people NUMERIC;
   v_communication_direct NUMERIC;
   v_communication_engage NUMERIC;
@@ -55,7 +55,7 @@ BEGIN
     -- 유형 코드에서 각 축의 극성 추출
     v_motivation_pole := CASE WHEN substring(v_type, 1, 1) = 'I' THEN 'intrinsic' ELSE 'extrinsic' END;
     v_flexibility_pole := CASE WHEN substring(v_type, 2, 1) = 'C' THEN 'change' ELSE 'system' END;
-    v_direction_pole := CASE WHEN substring(v_type, 3, 1) = 'R' THEN 'results' ELSE 'people' END;
+    v_direction_pole := CASE WHEN substring(v_type, 3, 1) = 'R' THEN 'work' ELSE 'people' END;
     v_communication_pole := CASE WHEN substring(v_type, 4, 1) = 'D' THEN 'direct' ELSE 'engage' END; -- 'N'도 'engage'로 처리
     
     -- 각 유형에 맞는 점수 생성 (해당 극성이 더 높도록)
@@ -79,9 +79,9 @@ BEGIN
         ELSE 3.0 + (random() * 1.0) 
       END;
       
-      v_direction_results := CASE 
-        WHEN v_direction_pole = 'results' THEN 5.0 + (random() * 1.5) 
-        ELSE 3.0 + (random() * 1.0) 
+      v_direction_work := CASE 
+        WHEN v_direction_pole = 'work' THEN 5.0 + (random() * 1.5) 
+        ELSE 3.0 + (random() * 1.0)
       END;
       v_direction_people := CASE 
         WHEN v_direction_pole = 'people' THEN 5.0 + (random() * 1.5) 
@@ -108,7 +108,7 @@ BEGIN
           'system', round(v_flexibility_system::numeric, 2)
         ),
         'direction', jsonb_build_object(
-          'results', round(v_direction_results::numeric, 2),
+          'work', round(v_direction_work::numeric, 2),
           'people', round(v_direction_people::numeric, 2)
         ),
         'communication', jsonb_build_object(
@@ -148,8 +148,8 @@ BEGIN
         'F15', CASE WHEN v_flexibility_pole = 'change' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,
         'F16', CASE WHEN v_flexibility_pole = 'change' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,
         
-        -- Direction 축 (D17-D24: Results)
-        'D17', CASE WHEN v_direction_pole = 'results' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,
+        -- Direction 축 (D17-D24: Work)
+        'D17', CASE WHEN v_direction_pole = 'work' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,
         'D18', CASE WHEN v_direction_pole = 'results' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,
         'D19', CASE WHEN v_direction_pole = 'results' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,
         'D20', CASE WHEN v_direction_pole = 'results' THEN 4 + floor(random() * 4)::int ELSE 1 + floor(random() * 3)::int END,

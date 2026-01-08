@@ -59,13 +59,13 @@ supabase
       axis_scores: {
         motivation: { intrinsic: 5.0, extrinsic: 3.0 },
         flexibility: { change: 4.5, system: 3.5 },
-        direction: { results: 6.0, people: 2.0 },
+        direction: { work: 6.0, people: 2.0 },
         communication: { direct: 5.5, engage: 2.5 }
       },
       pole: {
         motivation: 'intrinsic',
         flexibility: 'change',
-        direction: 'results',
+        direction: 'work',
         communication: 'direct'
       },
       answers: { M1: 5, M2: 6, M3: 4 } // 테스트용 일부 데이터
