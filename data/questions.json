@@ -6,7 +6,7 @@
       {
         "id": "MOT_01_L",
         "dimension": "Intrinsic",
-        "statement": "구성원들은 자신의 일이 의미 있고 성장에 도움이 된다고 느낄때 강하게 몰입한다.",
+        "statement": "구성원들은 자신의 일이 의미 있고 성장에 도움이 된다고 느낄 때 강하게 몰입한다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       },
       {
@@ -66,7 +66,7 @@
       {
         "id": "MOT_04_R",
         "dimension": "Extrinsic",
-        "statement": "구성원이 외부에서 인정받고 평가받는 경험을 중요하게 생각한다.",
+        "statement": "구성원이 외부에서도 자신의 성과를 인정받는 경험을 중요하게 생각한다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       }
     ]
@@ -78,7 +78,7 @@
       {
         "id": "FLX_01_L",
         "dimension": "Change",
-        "statement": "회사 또는 담당 조직 고유의 강점을 살리는 창의적인 대안을 모색한다.",
+        "statement": "회사 또는 담당 조직 고유의 강점을 살릴 수 있는 창의적 방안을 모색한다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       },
       {
@@ -132,7 +132,7 @@
       {
         "id": "FLX_04_L",
         "dimension": "Change",
-        "statement": "변화와 혁신을 시도하기 위해 소신껏 경영진의 지지와 구성원들의 동참을 이끌어낸다.",
+        "statement": "변화와 혁신을 위해 경영진의 지지와 구성원의 참여를 적극적으로 이끌어낸다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       },
       {
@@ -168,7 +168,7 @@
       {
         "id": "DIR_02_L",
         "dimension": "People",
-        "statement": "구성원들의 능력과 적성을 고려하여 성장할 수 있도록 배려(교육, 육성, 적절한 역할 책임 부여 등)를 제공한다.",
+        "statement": "구성원들의 능력과 적성을 고려하여 성장할 수 있도록 기회(교육, 육성, 적절한 역할 책임 부여 등)를 제공한다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       },
       {
