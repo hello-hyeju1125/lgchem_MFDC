@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import leadershipTypes from '@/data/leadershipTypes.json';
@@ -95,7 +95,7 @@ const AXIS_LABELS: Record<string, { name: string; nameEn: string; poles: Record<
   },
 };
 
-export default function DashboardDataPage() {
+function DashboardDataPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionCodeParam = searchParams.get('session_code');
@@ -342,7 +342,7 @@ export default function DashboardDataPage() {
                         outerRadius={150}
                         fill="#8884d8"
                         dataKey="count"
-                        label={(entry: TypeDistribution) => {
+                        label={(entry: any) => {
                           const total = data.totalResponses || 0;
                           const percentage = ((entry.count / total) * 100).toFixed(1);
                           return `${entry.type}\n${percentage}%`;
@@ -659,6 +659,24 @@ export default function DashboardDataPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function DashboardDataPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen py-6 sm:py-8 md:py-12 lg:py-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-light-blue/10 via-white via-brand-light-gray/5 to-brand-purple/6" />
+        <div className="w-full max-w-7xl mx-auto relative z-10 flex items-center justify-center" style={{ minHeight: '80vh' }}>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-brand-light-gray/30 border-t-brand-purple mx-auto mb-6" style={{ borderTopColor: '#551D83' }} />
+            <p className="text-gray-700 font-semibold text-lg sm:text-xl">로딩 중...</p>
+          </div>
+        </div>
+      </main>
+    }>
+      <DashboardDataPageContent />
+    </Suspense>
   );
 }
 
