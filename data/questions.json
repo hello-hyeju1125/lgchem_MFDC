@@ -150,13 +150,13 @@
       {
         "id": "DIR_01_L",
         "dimension": "People",
-        "statement": "구성원들의 업무상 고충이나 애로 사항 등에 항상 관심을 갖고 경청하며, 이를 극복할 수 있도록 도움을 준다.",
+        "statement": "업무 논의 시 구성원의 의견과 감정을 충분히 듣는 것을 중요하게 여긴다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       },
       {
         "id": "DIR_01_R",
         "dimension": "Work",
-        "statement": "애초에 수립한 목표에 어려움이 있더라도 포기하지 않고 반드시 달성하는 집념과 끈기가 있다.",
+        "statement": "업무 논의 시 쟁점과 의사결론을 신속히 정리하는 것을 중요하게 여긴다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       }
     ]
@@ -204,13 +204,13 @@
       {
         "id": "DIR_04_L",
         "dimension": "People",
-        "statement": "구성원들 간의 의견 불일치, 인간 관계 갈등 등의 중재자 역할을 잘 한다.",
+        "statement": "팀 내 갈등이 있을 경우 관계 회복과 상호 이해를 우선적으로 다룬다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       },
       {
         "id": "DIR_04_R",
         "dimension": "Work",
-        "statement": "구성원 간의 경쟁심을 적절히 활용하여 목표 달성 의지를 높인다.",
+        "statement": "팀 내 갈등이 있을 경우 업무 차질을 최소화하는 방향으로 정리한다.",
         "scale": { "min": 1, "max": 7, "midpoint": 4 }
       }
     ]
