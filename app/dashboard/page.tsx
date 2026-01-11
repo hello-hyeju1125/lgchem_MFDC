@@ -1,73 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import leadershipTypes from '@/data/leadershipTypes.json';
-import Image from 'next/image';
-
-interface TypeDistribution {
-  type: string;
-  count: number;
-  ratio: number;
-  [key: string]: string | number;
-}
-
-interface AxisStat {
-  axis: string;
-  poleDistribution: {
-    [key: string]: number;
-  };
-  meanScore: number;
-  stddevScore: number;
-}
-
-interface AggregatesData {
-  sessionCode?: string;
-  sessionTitle?: string;
-  sessionStartsAt?: string;
-  totalResponses: number;
-  typeDistribution: TypeDistribution[];
-  axisStats: AxisStat[];
-  insights?: {
-    highVarianceAxes: Array<{ axis: string; stddev: number }>;
-    skewedAxes: Array<{ axis: string; dominantPole: string; poleRatio: number }>;
-  };
-}
-
-const AXIS_LABELS: Record<string, { name: string; poles: Record<string, string> }> = {
-  motivation: {
-    name: '동기',
-    poles: {
-      intrinsic: '내재적',
-      extrinsic: '외재적',
-      balanced: '균형',
-    },
-  },
-  flexibility: {
-    name: '유연성',
-    poles: {
-      change: '변화',
-      system: '관리',
-      balanced: '균형',
-    },
-  },
-  direction: {
-    name: '방향성',
-    poles: {
-      work: '일',
-      people: '사람',
-      balanced: '균형',
-    },
-  },
-  communication: {
-    name: '소통',
-    poles: {
-      direct: '지시',
-      engage: '참여',
-      balanced: '균형',
-    },
-  },
-};
+import { useRouter } from 'next/navigation';
 
 interface Session {
   session_code: string;
@@ -77,11 +11,10 @@ interface Session {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [sessionCode, setSessionCode] = useState('');
   const [adminKey, setAdminKey] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<AggregatesData | null>(null);
   
   // 세션 관리 상태
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -178,52 +111,34 @@ export default function DashboardPage() {
     }
   };
 
-  // 집계 데이터 조회
-  const handleSubmit = async (e?: React.FormEvent) => {
+  // 데이터 조회 페이지로 이동
+  const handleSubmit = (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
 
-    if (!sessionCode || !adminKey) {
-      setError('세션 코드와 관리자 키를 모두 입력해주세요');
+    if (!sessionCode) {
+      setError('세션 코드를 입력해주세요');
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setData(null);
-
-    try {
-      const params = new URLSearchParams({
-        session_code: sessionCode,
-        admin_key: adminKey,
-      });
-
-      const response = await fetch(`/api/admin/aggregates?${params.toString()}`);
-      const result = await response.json();
-
-      if (!result.success) {
-        setError(result.error || '데이터를 불러오는데 실패했습니다');
-        return;
-      }
-
-      setData(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다');
-    } finally {
-      setLoading(false);
+    if (!adminKey) {
+      setError('관리자 키를 입력해주세요');
+      return;
     }
+
+    setError(null);
+    // 관리자 키를 sessionStorage에 저장 (데이터 조회 페이지에서 사용)
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('admin_key', adminKey);
+    }
+    // 데이터 조회 페이지로 이동 (세션 코드를 쿼리 파라미터로 전달)
+    router.push(`/dashboard/data?session_code=${encodeURIComponent(sessionCode)}`);
   };
 
-  // 세션 선택 시 자동 조회
+  // 세션 선택 시 세션 코드만 설정
   const handleSessionSelect = (code: string) => {
     setSessionCode(code);
-    if (adminKey) {
-      // 약간의 지연 후 자동 조회 (상태 업데이트 완료 후)
-      setTimeout(() => {
-        handleSubmit();
-      }, 100);
-    }
   };
 
   return (
@@ -307,10 +222,10 @@ export default function DashboardPage() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                disabled={loading || !sessionCode || !adminKey}
+                disabled={!sessionCode}
                 className="flex-1 py-3 px-6 bg-gradient-to-r from-brand-purple to-brand-magenta text-white font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
-                {loading ? '조회 중...' : '데이터 조회'}
+                데이터 조회
               </button>
               <button
                 type="button"
@@ -370,230 +285,6 @@ export default function DashboardPage() {
         {error && (
           <div className="glass-premium rounded-3xl p-6 mb-8 max-w-2xl mx-auto bg-red-50/80 border border-red-200">
             <p className="text-red-600 font-semibold">오류: {error}</p>
-          </div>
-        )}
-
-        {/* 데이터 표시 */}
-        {data && (
-          <div className="space-y-8">
-            {/* 요약 카드 */}
-            <div className="glass-premium rounded-3xl p-6 sm:p-8">
-              <h2 className="text-2xl font-bold mb-4 text-gray-800">세션 요약</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-brand-purple/10 to-brand-magenta/10 rounded-xl p-4">
-                  <p className="text-sm text-gray-600 mb-1">총 응답 수</p>
-                  <p className="text-3xl font-bold text-brand-purple">{data.totalResponses}</p>
-                </div>
-                <div className="bg-gradient-to-br from-brand-light-blue/10 to-brand-purple/10 rounded-xl p-4">
-                  <p className="text-sm text-gray-600 mb-1">유형 종류</p>
-                  <p className="text-3xl font-bold text-brand-purple">{data.typeDistribution?.length || 0}</p>
-                </div>
-                <div className="bg-gradient-to-br from-brand-magenta/10 to-brand-light-blue/10 rounded-xl p-4">
-                  <p className="text-sm text-gray-600 mb-1">데이터 축</p>
-                  <p className="text-3xl font-bold text-brand-purple">4</p>
-                </div>
-              </div>
-              {data.sessionTitle && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">세션명: <span className="font-semibold text-gray-800">{data.sessionTitle}</span></p>
-                  {data.sessionStartsAt && (
-                    <p className="text-sm text-gray-600 mt-1">시작일시: <span className="font-semibold text-gray-800">{new Date(data.sessionStartsAt).toLocaleString('ko-KR')}</span></p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 유형 분포 */}
-            {data.typeDistribution && data.typeDistribution.length > 0 && (
-              <div className="glass-premium rounded-3xl p-6 sm:p-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">리더십 유형 분포</h2>
-                <div className="w-full" style={{ height: '500px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={data.typeDistribution}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={150}
-                        fill="#8884d8"
-                        dataKey="count"
-                      >
-                        {data.typeDistribution.map((entry, index) => {
-                          const colors = [
-                            '#9333ea', // brand-purple
-                            '#ec4899', // brand-magenta
-                            '#3b82f6', // brand-light-blue
-                            '#8b5cf6', // purple variant
-                            '#f59e0b', // amber
-                            '#10b981', // emerald
-                            '#ef4444', // red
-                            '#06b6d4', // cyan
-                            '#f97316', // orange
-                            '#6366f1', // indigo
-                            '#14b8a6', // teal
-                            '#a855f7', // violet
-                            '#eab308', // yellow
-                            '#22c55e', // green
-                            '#3b82f6', // blue
-                            '#f43f5e', // rose
-                          ];
-                          return (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={colors[index % colors.length]} 
-                            />
-                          );
-                        })}
-                      </Pie>
-                      <Tooltip
-                        content={({ active, payload }) => {
-                          if (!active || !payload || !payload[0]) return null;
-                          
-                          const itemData = payload[0].payload;
-                          const typeCode = itemData.type;
-                          const typeInfo = (leadershipTypes as any)[typeCode];
-                          const representativePerson = typeInfo?.representativePerson || typeCode;
-                          const total = data.totalResponses || 0;
-                          const percentage = ((itemData.count / total) * 100).toFixed(1);
-                          
-                          return (
-                            <div className="bg-white rounded-xl p-8 shadow-lg border-2 border-gray-200">
-                              <div className="flex items-center gap-6 mb-4">
-                                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-4 border-brand-purple/20">
-                                  <Image
-                                    src={`/images/portraits/${typeCode}.png`}
-                                    alt={representativePerson}
-                                    fill
-                                    className="object-cover"
-                                  />
-                                </div>
-                                <div>
-                                  <p className="font-bold text-gray-800 text-2xl">{representativePerson}</p>
-                                  <p className="text-base text-gray-600 mt-1">{typeCode}</p>
-                                </div>
-                              </div>
-                              <div className="pt-4 border-t-2 border-gray-200">
-                                <p className="text-center text-gray-600">
-                                  <span className="font-semibold text-brand-purple text-2xl">{itemData.count}명</span>
-                                  <span className="ml-2 text-xl">({percentage}%)</span>
-                                </p>
-                              </div>
-                            </div>
-                          );
-                        }}
-                      />
-                      <Legend
-                        formatter={(value, entry: any) => {
-                          const typeCode = entry.payload.type;
-                          const typeInfo = (leadershipTypes as any)[typeCode];
-                          const representativePerson = typeInfo?.representativePerson || typeCode;
-                          return `${representativePerson} (${typeCode})`;
-                        }}
-                        wrapperStyle={{ paddingTop: '20px' }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-
-            {/* 4축 통계 */}
-            {data.axisStats && data.axisStats.length > 0 && (
-              <div className="glass-premium rounded-3xl p-6 sm:p-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">4축 통계</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {data.axisStats.map((stat) => {
-                    const axisLabel = AXIS_LABELS[stat.axis] || { name: stat.axis, poles: {} };
-                    return (
-                      <div key={stat.axis} className="bg-white/60 rounded-xl p-6">
-                        <h3 className="text-xl font-bold mb-4 text-gray-800">{axisLabel.name}</h3>
-                        
-                        {/* 평균 및 표준편차 */}
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <p className="text-sm text-gray-600 mb-1">평균 점수</p>
-                            <p className="text-2xl font-bold text-brand-purple">{stat.meanScore.toFixed(2)}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-600 mb-1">표준편차</p>
-                            <p className="text-2xl font-bold text-brand-magenta">{stat.stddevScore.toFixed(2)}</p>
-                          </div>
-                        </div>
-
-                        {/* 극성 분포 */}
-                        <div className="space-y-2">
-                          <p className="text-sm font-semibold text-gray-700 mb-2">극성 분포</p>
-                          {Object.entries(stat.poleDistribution).map(([pole, ratio]) => (
-                            <div key={pole} className="flex items-center justify-between">
-                              <span className="text-sm text-gray-700">
-                                {axisLabel.poles[pole] || pole}
-                              </span>
-                              <div className="flex items-center gap-2 flex-1 mx-4">
-                                <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-brand-light-blue to-brand-purple"
-                                    style={{ width: `${ratio * 100}%` }}
-                                  />
-                                </div>
-                                <span className="text-sm font-semibold text-gray-800 w-16 text-right">
-                                  {(ratio * 100).toFixed(1)}%
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* 인사이트 */}
-            {data.insights && (
-              <div className="glass-premium rounded-3xl p-6 sm:p-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">디브리핑 인사이트</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* 편차가 큰 축 */}
-                  {data.insights.highVarianceAxes && data.insights.highVarianceAxes.length > 0 && (
-                    <div className="bg-white/60 rounded-xl p-6">
-                      <h3 className="text-lg font-bold mb-4 text-gray-800">편차가 큰 축 (TOP 2)</h3>
-                      <ul className="space-y-2">
-                        {data.insights.highVarianceAxes.map((item) => {
-                          const axisLabel = AXIS_LABELS[item.axis] || { name: item.axis };
-                          return (
-                            <li key={item.axis} className="flex justify-between items-center">
-                              <span className="text-gray-700">{axisLabel.name}</span>
-                              <span className="font-semibold text-brand-purple">{item.stddev.toFixed(2)}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* 한쪽으로 치우친 축 */}
-                  {data.insights.skewedAxes && data.insights.skewedAxes.length > 0 && (
-                    <div className="bg-white/60 rounded-xl p-6">
-                      <h3 className="text-lg font-bold mb-4 text-gray-800">한쪽으로 치우친 축 (TOP 2)</h3>
-                      <ul className="space-y-2">
-                        {data.insights.skewedAxes.map((item) => {
-                          const axisLabel = AXIS_LABELS[item.axis] || { name: item.axis, poles: {} };
-                          return (
-                            <li key={item.axis} className="flex justify-between items-center">
-                              <span className="text-gray-700">
-                                {axisLabel.name} ({axisLabel.poles[item.dominantPole] || item.dominantPole})
-                              </span>
-                              <span className="font-semibold text-brand-magenta">{(item.poleRatio * 100).toFixed(1)}%</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
