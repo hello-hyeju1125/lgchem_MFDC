@@ -342,10 +342,10 @@ export default function DashboardDataPage() {
                         outerRadius={150}
                         fill="#8884d8"
                         dataKey="count"
-                        label={({ type, count }) => {
+                        label={(entry: TypeDistribution) => {
                           const total = data.totalResponses || 0;
-                          const percentage = ((count / total) * 100).toFixed(1);
-                          return `${type}\n${percentage}%`;
+                          const percentage = ((entry.count / total) * 100).toFixed(1);
+                          return `${entry.type}\n${percentage}%`;
                         }}
                         labelLine={false}
                       >
