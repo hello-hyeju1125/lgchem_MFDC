@@ -14,7 +14,7 @@ const DIMENSION_DESCRIPTIONS: Record<string, string> = {
   Work: '일 중심',
   People: '사람 중심',
   Direct: '지시형 소통',
-  eNgage: '참여형 소통',
+  Engage: '참여형 소통',
 };
 
 interface DevelopmentPoint {
@@ -158,7 +158,7 @@ export default function ResultCodePage() {
         Motivation: { dimension1: 'Intrinsic', dimension2: 'Extrinsic', code1: 'I', code2: 'E' },
         Flexibility: { dimension1: 'Change', dimension2: 'System', code1: 'C', code2: 'S' },
         Direction: { dimension1: 'Work', dimension2: 'People', code1: 'W', code2: 'P' },
-        Communication: { dimension1: 'Direct', dimension2: 'eNgage', code1: 'D', code2: 'N' },
+        Communication: { dimension1: 'Direct', dimension2: 'Engage', code1: 'D', code2: 'N' },
       };
       
       const axes = ['Motivation', 'Flexibility', 'Direction', 'Communication'] as const;
